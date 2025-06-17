@@ -1,0 +1,6 @@
+{
+    "model_name": "mistral-medium-latest",
+    "temperature": 0.1,
+    "max_tokens": 4000,
+    "timeout": 30
+}

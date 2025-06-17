@@ -1,0 +1,27 @@
+services:
+  # Multi-agent application
+  app:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app
+      - ./prompts:/app/prompts
+      - ./settings:/app/settings
+    environment:
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
+      - LANGFUSE_HOST=${LANGFUSE_HOST}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - LOG_LEVEL=${LOG_LEVEL}
+    command: watchmedo auto-restart --directory=/app --pattern="*.py" --recursive -- python main.py
+    networks:
+      - agent_network
+
+volumes:
+
+networks:
+  agent_network:
+    driver: bridge
