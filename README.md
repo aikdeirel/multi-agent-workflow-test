@@ -1,13 +1,17 @@
 # Multi-Agent Workflow System
 
-A sophisticated stateless multi-agent system built with LangChain and monitored with Langfuse Cloud for production-ready AI workflows.
+**⚠️ EXPERIMENTAL PROJECT - FOR LEARNING & TESTING PURPOSES ONLY**
+
+This is a personal experiment and educational project for exploring multi-agent systems, LangChain, and AI workflow patterns. This project is **NOT intended for production use** and is purely for experimentation, testing, and self-education purposes.
+
+A sophisticated stateless multi-agent system built with LangChain and monitored with Langfuse Cloud for learning AI workflow concepts.
 
 ## Features
 
 - 🤖 **Multi-Agent Architecture**: Orchestrated agent system with specialized tools
 - 📊 **Cloud Monitoring**: Integrated with [Langfuse Cloud](https://langfuse.com) for comprehensive tracing and analytics
 - 🔧 **Flexible Tools**: Extensible tool system for various operations
-- 🚀 **Production Ready**: Containerized deployment with health checks and logging
+- 🧪 **Experimental**: Containerized deployment for testing and learning
 - 🛡️ **Type Safety**: Full TypeScript-style validation with Pydantic
 - 📈 **Stateless Design**: No local data persistence required
 - ⚡ **Lightweight**: Minimal infrastructure dependencies
@@ -190,14 +194,21 @@ python main.py
 
 The system supports multiple agent types. See `src/agent_factory.py` for examples.
 
-## Deployment
+## Important Notes
 
-### Production Considerations
+### Experimental Nature
 
-1. **Security**: Use secrets management for API keys
-2. **Scaling**: The stateless design makes horizontal scaling easy
-3. **Monitoring**: Set up additional monitoring with health check endpoints
-4. **Networking**: Consider using a reverse proxy for production
+This project is designed for:
+- 🧪 **Learning**: Understanding multi-agent architectures
+- 🔬 **Experimentation**: Testing AI workflow patterns
+- 📚 **Education**: Personal skill development in LangChain and AI systems
+- 🛠️ **Prototyping**: Rapid testing of AI agent concepts
+
+### Not Suitable For:
+- ❌ Production deployments
+- ❌ Commercial applications  
+- ❌ Mission-critical systems
+- ❌ Handling sensitive data
 
 ### Docker Compose Override
 
