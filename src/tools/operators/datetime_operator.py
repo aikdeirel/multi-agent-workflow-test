@@ -72,7 +72,11 @@ def get_unix_time(timestamp: Optional[str] = None) -> str:
         actual_timestamp = timestamp
 
         if isinstance(timestamp, str):
-            if timestamp.startswith("{"):
+            # Check if it contains "Observation:" which means agent passed entire observation
+            if "Observation:" in timestamp:
+                logger.debug("Detected agent passed entire observation, ignoring")
+                actual_timestamp = None
+            elif timestamp.startswith("{"):
                 try:
                     # Try to parse as JSON and extract the timestamp
                     data = json.loads(timestamp)
@@ -88,6 +92,8 @@ def get_unix_time(timestamp: Optional[str] = None) -> str:
                     actual_timestamp = timestamp
             elif timestamp == "{}":  # Empty dict as string
                 actual_timestamp = None
+            elif timestamp.strip() == "":  # Empty or whitespace
+                actual_timestamp = None
 
         params = {}
         if actual_timestamp:
@@ -98,15 +104,36 @@ def get_unix_time(timestamp: Optional[str] = None) -> str:
         if result is None:
             return "Error: Unable to retrieve Unix time from the API"
 
-        if isinstance(result, dict) and "result" in result:
-            unix_time = result["result"]
+        if isinstance(result, dict):
+            if "time" in result:
+                unix_time = result["time"]
+            elif "result" in result:
+                unix_time = result["result"]
+            else:
+                unix_time = result
         else:
             unix_time = result
 
         if actual_timestamp:
-            return f"Unix timestamp for '{actual_timestamp}': {unix_time}"
+            # Also return the date format for easier processing
+            try:
+                from datetime import datetime
+
+                dt = datetime.fromtimestamp(int(unix_time))
+                date_str = dt.strftime("%Y-%m-%d")
+                return f"Unix timestamp for '{actual_timestamp}': {unix_time} (Date: {date_str})"
+            except:
+                return f"Unix timestamp for '{actual_timestamp}': {unix_time}"
         else:
-            return f"Current Unix timestamp: {unix_time}"
+            # Return current time with both unix and readable format
+            try:
+                from datetime import datetime
+
+                dt = datetime.fromtimestamp(int(unix_time))
+                date_str = dt.strftime("%Y-%m-%d")
+                return f"Current Unix timestamp: {unix_time} (Current date: {date_str})"
+            except:
+                return f"Current Unix timestamp: {unix_time}"
 
     except Exception as e:
         logger.error(f"Error getting Unix time: {str(e)}")
@@ -234,18 +261,33 @@ def validate_date(date: str) -> str:
     logger.info(f"Validating date: {date}")
 
     try:
-        params = {"date": date}
+        # Handle case where LangChain passes JSON string instead of raw value
+        import json
+
+        actual_date = date
+        if isinstance(date, str) and date.startswith("{"):
+            try:
+                # Try to parse as JSON and extract the date
+                data = json.loads(date)
+                if isinstance(data, dict) and "date" in data:
+                    actual_date = data["date"]
+                    logger.debug(f"Extracted date from JSON: {actual_date}")
+            except (json.JSONDecodeError, KeyError):
+                # If JSON parsing fails, use the original string
+                actual_date = date
+
+        params = {"date": actual_date}
         result = make_digidates_request("/checkdate", params)
 
         if result is None:
-            return f"Error: Unable to validate date {date}"
+            return f"Error: Unable to validate date {actual_date}"
 
         if isinstance(result, dict) and "result" in result:
             is_valid = result["result"]
         else:
             is_valid = result
 
-        return f"Date {date} is {'valid' if is_valid else 'invalid'}"
+        return f"Date {actual_date} is {'valid' if is_valid else 'invalid'}"
 
     except Exception as e:
         logger.error(f"Error validating date: {str(e)}")
@@ -269,11 +311,26 @@ def get_weekday(date: str) -> str:
     logger.info(f"Getting weekday for date: {date}")
 
     try:
-        params = {"date": date}
+        # Handle case where LangChain passes JSON string instead of raw value
+        import json
+
+        actual_date = date
+        if isinstance(date, str) and date.startswith("{"):
+            try:
+                # Try to parse as JSON and extract the date
+                data = json.loads(date)
+                if isinstance(data, dict) and "date" in data:
+                    actual_date = data["date"]
+                    logger.debug(f"Extracted date from JSON: {actual_date}")
+            except (json.JSONDecodeError, KeyError):
+                # If JSON parsing fails, use the original string
+                actual_date = date
+
+        params = {"date": actual_date}
         result = make_digidates_request("/weekday", params)
 
         if result is None:
-            return f"Error: Unable to get weekday for date {date}"
+            return f"Error: Unable to get weekday for date {actual_date}"
 
         if isinstance(result, dict) and "result" in result:
             weekday_num = result["result"]
@@ -292,11 +349,9 @@ def get_weekday(date: str) -> str:
         ]
         if isinstance(weekday_num, int) and 0 <= weekday_num <= 6:
             weekday_name = weekdays[weekday_num]
-            return (
-                f"Date {date} falls on a {weekday_name} (weekday number: {weekday_num})"
-            )
+            return f"Date {actual_date} falls on a {weekday_name} (weekday number: {weekday_num})"
         else:
-            return f"Weekday number for {date}: {weekday_num}"
+            return f"Weekday number for {actual_date}: {weekday_num}"
 
     except Exception as e:
         logger.error(f"Error getting weekday: {str(e)}")
@@ -321,7 +376,28 @@ def calculate_progress(start_date: str, end_date: str) -> str:
     logger.info(f"Calculating progress from {start_date} to {end_date}")
 
     try:
-        params = {"start": start_date, "end": end_date}
+        # Handle case where LangChain passes JSON string instead of raw values
+        import json
+
+        actual_start_date = start_date
+        actual_end_date = end_date
+
+        if isinstance(start_date, str) and start_date.startswith("{"):
+            try:
+                # Try to parse as JSON and extract both start_date and end_date
+                data = json.loads(start_date)
+                if isinstance(data, dict):
+                    actual_start_date = data.get("start_date", start_date)
+                    actual_end_date = data.get("end_date", end_date)
+                    logger.debug(
+                        f"Extracted from JSON - start: {actual_start_date}, end: {actual_end_date}"
+                    )
+            except (json.JSONDecodeError, KeyError):
+                # If JSON parsing fails, use the original values
+                actual_start_date = start_date
+                actual_end_date = end_date
+
+        params = {"start": actual_start_date, "end": actual_end_date}
         result = make_digidates_request("/progress", params)
 
         if result is None:
@@ -338,15 +414,15 @@ def calculate_progress(start_date: str, end_date: str) -> str:
             if isinstance(progress_data, dict):
                 float_progress = progress_data.get("float", "N/A")
                 percent_progress = progress_data.get("percent", "N/A")
-                return f"Progress from {start_date} to {end_date}: {percent_progress}% ({float_progress} as decimal)"
+                return f"Progress from {actual_start_date} to {actual_end_date}: {percent_progress}% ({float_progress} as decimal)"
             else:
-                return f"Progress from {start_date} to {end_date}: {progress_data}"
+                return f"Progress from {actual_start_date} to {actual_end_date}: {progress_data}"
         else:
-            return f"Progress from {start_date} to {end_date}: {result}"
+            return f"Progress from {actual_start_date} to {actual_end_date}: {result}"
 
     except Exception as e:
         logger.error(f"Error calculating progress: {str(e)}")
-        return f"Error calculating progress from {start_date} to {end_date}: {str(e)}"
+        return f"Error calculating progress from {actual_start_date} to {actual_end_date}: {str(e)}"
 
 
 @tool
@@ -569,11 +645,32 @@ def get_german_holidays(
     logger.info(f"Getting German holidays for year: {year}, region: {region}")
 
     try:
+        # Handle case where LangChain passes JSON string instead of raw values
+        import json
+
+        actual_year = year
+        actual_region = region
+
+        if isinstance(year, str) and year.startswith("{"):
+            try:
+                # Try to parse as JSON and extract both year and region
+                data = json.loads(year)
+                if isinstance(data, dict):
+                    actual_year = data.get("year", year)
+                    actual_region = data.get("region", region)
+                    logger.debug(
+                        f"Extracted from JSON - year: {actual_year}, region: {actual_region}"
+                    )
+            except (json.JSONDecodeError, KeyError):
+                # If JSON parsing fails, use the original values
+                actual_year = year
+                actual_region = region
+
         params = {}
-        if year:
-            params["year"] = year
-        if region:
-            params["region"] = region
+        if actual_year:
+            params["year"] = actual_year
+        if actual_region:
+            params["region"] = actual_region
 
         result = make_digidates_request("/germanpublicholidays", params)
 
@@ -586,8 +683,8 @@ def get_german_holidays(
             holidays_data = result
 
         if isinstance(holidays_data, list):
-            year_str = year if year else "current year"
-            region_str = f" in region {region}" if region else ""
+            year_str = actual_year if actual_year else "current year"
+            region_str = f" in region {actual_region}" if actual_region else ""
 
             response_parts = [f"German public holidays for {year_str}{region_str}:"]
             for i, holiday in enumerate(holidays_data, 1):
