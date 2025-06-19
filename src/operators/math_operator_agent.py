@@ -4,6 +4,7 @@ from langchain.agents import create_react_agent, AgentExecutor
 from langchain.prompts import PromptTemplate
 from langchain_mistralai import ChatMistralAI
 from langchain.tools import tool
+from langchain.callbacks.base import BaseCallbackHandler
 
 from config import load_json_setting
 from prompt_manager import get_prompt_manager
@@ -11,6 +12,46 @@ from tools.operators.math_operator import calculate, math_help
 from tools import factory as tool_factory
 
 logger = logging.getLogger(__name__)
+
+
+class MathOperatorCallback(BaseCallbackHandler):
+    """Callback handler for math operator internal actions."""
+
+    def __init__(self):
+        super().__init__()
+        self.logger = logging.getLogger("operators.math_internal")
+
+    def on_agent_action(self, action, **kwargs):
+        """Called when math agent takes an action."""
+        self.logger.info(f"🧮 MATH AGENT ACTION: {action.tool}")
+        self.logger.info(f"📋 MATH AGENT PARAMETERS: {action.tool_input}")
+
+    def on_tool_end(self, output, **kwargs):
+        """Called when math tool ends."""
+        self.logger.info(f"🔧 MATH TOOL RESPONSE: {str(output)[:200]}...")
+
+    def on_text(self, text, **kwargs):
+        """Called on math agent text - captures thinking."""
+        if text and text.strip():
+            text_stripped = text.strip()
+            if text_stripped.startswith("Thought:"):
+                thinking = text_stripped.replace("Thought:", "").strip()
+                self.logger.info(f"💭 MATH AGENT THINKING: {thinking}")
+            elif "I need" in text_stripped or "I should" in text_stripped:
+                self.logger.info(f"🤔 MATH AGENT REASONING: {text_stripped}")
+
+    def on_llm_start(self, serialized, prompts, **kwargs):
+        """Called when math agent LLM starts."""
+        if prompts and len(prompts) > 0:
+            for i, prompt in enumerate(prompts):
+                # Log a truncated version of the prompt sent to math operator
+                if len(str(prompt)) > 300:
+                    truncated = (
+                        str(prompt)[:150] + "...[TRUNCATED]..." + str(prompt)[-100:]
+                    )
+                    self.logger.info(f"📝 MATH AGENT PROMPT #{i+1}: {truncated}")
+                else:
+                    self.logger.info(f"📝 MATH AGENT PROMPT #{i+1}: {prompt}")
 
 
 def create_math_operator_agent(llm: ChatMistralAI) -> AgentExecutor:
@@ -77,7 +118,7 @@ Thought:{{agent_scratchpad}}"""
         # Create ReAct agent
         agent = create_react_agent(llm=llm, tools=math_tools, prompt=prompt_template)
 
-        # Create executor
+        # Create executor with callback
         executor = AgentExecutor(
             agent=agent,
             tools=math_tools,
@@ -86,6 +127,7 @@ Thought:{{agent_scratchpad}}"""
             max_execution_time=120,
             return_intermediate_steps=True,
             handle_parsing_errors=True,
+            callbacks=[MathOperatorCallback()],  # Add math-specific callback
         )
 
         logger.info("Math operator agent created successfully")
@@ -115,7 +157,12 @@ def math_operator(query: str) -> str:
         - math_operator("What is the square root of 144?")
         - math_operator("Solve the expression 50 * 2 + 25")
     """
-    logger.info(f"Math operator received task: {query}")
+    logger.info(f"🧮 Math operator received task: {query}")
+
+    # Enhanced logging for math operator
+    math_logger = logging.getLogger("operators.math_operator_agent")
+    math_logger.info(f"📊 MATH OPERATOR STARTING TASK: {query}")
+    math_logger.info("🔧 Creating specialized math agent...")
 
     try:
         # Use Langfuse 3.x context approach
@@ -150,12 +197,31 @@ def math_operator(query: str) -> str:
 
                 # Create math operator agent
                 math_agent = create_math_operator_agent(llm)
+                math_logger.info("✅ Math agent created successfully")
+
+                # Log the prompt that will be sent to the math operator
+                math_logger.info(f"📋 SENDING TASK TO MATH AGENT: {query}")
 
                 # Execute the task
+                math_logger.info("🚀 Executing math task...")
                 result = math_agent.invoke({"input": query})
 
                 # Extract the output
                 output = result.get("output", "No response from math operator")
+
+                # Log intermediate steps if any
+                intermediate_steps = result.get("intermediate_steps", [])
+                if intermediate_steps:
+                    math_logger.info(
+                        f"🔍 Math agent used {len(intermediate_steps)} tools:"
+                    )
+                    for i, (action, observation) in enumerate(intermediate_steps):
+                        math_logger.info(
+                            f"  Step {i+1}: {action.tool} -> {str(observation)[:100]}..."
+                        )
+
+                # Log the final math operator response
+                math_logger.info(f"🧮 MATH OPERATOR RESPONSE: {output}")
 
                 # Update operator span with results
                 operator_span.update(
@@ -170,7 +236,7 @@ def math_operator(query: str) -> str:
                 )
                 logger.info("✅ Updated math operator span")
 
-                logger.info("Math operator completed task successfully")
+                logger.info("🧮 Math operator completed task successfully")
                 return output
 
         except Exception as e:
@@ -190,14 +256,31 @@ def math_operator(query: str) -> str:
 
             # Create math operator agent
             math_agent = create_math_operator_agent(llm)
+            math_logger.info("✅ Math agent created successfully (fallback mode)")
+
+            # Log the prompt that will be sent to the math operator
+            math_logger.info(f"📋 SENDING TASK TO MATH AGENT (FALLBACK): {query}")
 
             # Execute the task
+            math_logger.info("🚀 Executing math task (fallback mode)...")
             result = math_agent.invoke({"input": query})
 
             # Extract the output
             output = result.get("output", "No response from math operator")
 
-            logger.info("Math operator completed task successfully")
+            # Log intermediate steps if any
+            intermediate_steps = result.get("intermediate_steps", [])
+            if intermediate_steps:
+                math_logger.info(f"🔍 Math agent used {len(intermediate_steps)} tools:")
+                for i, (action, observation) in enumerate(intermediate_steps):
+                    math_logger.info(
+                        f"  Step {i+1}: {action.tool} -> {str(observation)[:100]}..."
+                    )
+
+            # Log the final math operator response
+            math_logger.info(f"🧮 MATH OPERATOR RESPONSE (FALLBACK): {output}")
+
+            logger.info("🧮 Math operator completed task successfully")
             return output
 
     except Exception as e:

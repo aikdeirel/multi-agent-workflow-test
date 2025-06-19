@@ -18,46 +18,86 @@ logger = logging.getLogger(__name__)
 
 
 class ProperLoggingCallback(BaseCallbackHandler):
-    """Custom callback handler for agent actions with rich verbose output and proper formatting."""
+    """Enhanced callback handler for detailed multi-agent workflow logging."""
 
     def __init__(self):
         super().__init__()
         self.logger = logging.getLogger("agent_executor")
+        self.orchestrator_logger = logging.getLogger("orchestrator")
+        self.step_counter = 0
 
     def on_chain_start(self, serialized, inputs, **kwargs):
         """Called when chain starts."""
         self.logger.info("")
         self.logger.info("🚀 \033[1;36m> Entering new AgentExecutor chain...\033[0m")
 
+        # Log the initial input to the orchestrator
+        if inputs and "input" in inputs:
+            self.orchestrator_logger.info(f"🎯 ORCHESTRATOR INPUT: {inputs['input']}")
+
     def on_agent_action(self, action, **kwargs):
         """Called when agent takes an action."""
-        self.logger.info(f"\033[1;32mAction:\033[0m {action.tool}")
-        self.logger.info(f"\033[1;32mAction Input:\033[0m {action.tool_input}")
+        self.step_counter += 1
+
+        self.logger.info(
+            f"\033[1;32m🎬 Action #{self.step_counter}:\033[0m {action.tool}"
+        )
+        self.logger.info(f"\033[1;32m📥 Action Input:\033[0m {action.tool_input}")
+
+        # Enhanced logging for operator delegation
+        if hasattr(action, "tool_input") and isinstance(action.tool_input, (str, dict)):
+            tool_input = action.tool_input
+            if isinstance(tool_input, dict) and "query" in tool_input:
+                operator_query = tool_input["query"]
+                self.orchestrator_logger.info(
+                    f"🤖 DELEGATING TO {action.tool.upper()}: {operator_query}"
+                )
+            elif isinstance(tool_input, str):
+                self.orchestrator_logger.info(
+                    f"🤖 DELEGATING TO {action.tool.upper()}: {tool_input}"
+                )
 
     def on_tool_start(self, serialized, input_str, **kwargs):
         """Called when tool starts."""
         tool_name = serialized.get("name", "Unknown Tool")
         self.logger.info(f"\033[1;33m⚡ Starting operator '{tool_name}'\033[0m")
 
+        # Log the actual input being sent to the operator
+        if input_str:
+            operator_logger = logging.getLogger(f"operators.{tool_name}")
+            operator_logger.info(f"📋 OPERATOR TASK RECEIVED: {input_str}")
+
     def on_tool_end(self, output, **kwargs):
         """Called when tool ends."""
         # Format tool output with proper line breaks and color
         formatted_output = str(output).strip()
-        self.logger.info(f"\033[1;34mObservation:\033[0m {formatted_output}")
+        self.logger.info(f"\033[1;34m📤 Observation:\033[0m {formatted_output}")
+
+        # Log operator response in detail
+        operator_logger = logging.getLogger("operators.response")
+        operator_logger.info(f"✅ OPERATOR RESPONSE: {formatted_output}")
 
     def on_tool_error(self, error, **kwargs):
         """Called when tool encounters an error."""
         self.logger.error(f"\033[1;31m❌ Operator error:\033[0m {str(error)}")
 
+        # Log operator error in detail
+        operator_logger = logging.getLogger("operators.error")
+        operator_logger.error(f"💥 OPERATOR ERROR: {str(error)}")
+
     def on_agent_finish(self, finish, **kwargs):
         """Called when agent finishes."""
         final_output = finish.return_values.get("output", "No output")
-        self.logger.info(f"\033[1;35mFinal Answer:\033[0m {final_output}")
+        self.logger.info(f"\033[1;35m🏁 Final Answer:\033[0m {final_output}")
+
+        # Log final orchestrator decision
+        self.orchestrator_logger.info(f"🎉 ORCHESTRATOR FINAL ANSWER: {final_output}")
 
     def on_chain_end(self, outputs, **kwargs):
         """Called when chain ends."""
         self.logger.info("")
         self.logger.info("✅ \033[1;36m> Finished chain.\033[0m")
+        self.step_counter = 0  # Reset counter
 
     def on_text(self, text, **kwargs):
         """Called on arbitrary text - this captures the agent's thinking."""
@@ -66,19 +106,86 @@ class ProperLoggingCallback(BaseCallbackHandler):
             text_stripped = text.strip()
             # Filter out some verbose internal text but keep the thinking
             if not any(skip in text_stripped for skip in ["Invoking:", "Got output"]):
-                # Check if this is a "Thought:" line and color it appropriately
+                # Enhanced thinking capture for orchestrator
                 if text_stripped.startswith("Thought:"):
-                    self.logger.info(f"\033[1;37m{text_stripped}\033[0m")
+                    thinking = text_stripped.replace("Thought:", "").strip()
+                    self.logger.info(f"\033[1;37m💭 Thought:\033[0m {thinking}")
+                    self.orchestrator_logger.info(
+                        f"🧠 ORCHESTRATOR THINKING: {thinking}"
+                    )
+                elif "I need to" in text_stripped or "I should" in text_stripped:
+                    self.orchestrator_logger.info(
+                        f"🤔 ORCHESTRATOR REASONING: {text_stripped}"
+                    )
+                elif (
+                    "delegate" in text_stripped.lower()
+                    or "operator" in text_stripped.lower()
+                ):
+                    self.orchestrator_logger.info(
+                        f"🎯 ORCHESTRATOR DELEGATION PLANNING: {text_stripped}"
+                    )
                 else:
-                    self.logger.info(f"{text_stripped}")
+                    self.logger.info(f"\033[1;90m{text_stripped}\033[0m")
 
     def on_llm_start(self, serialized, prompts, **kwargs):
         """Called when LLM starts."""
         self.logger.debug("\033[1;90m🧠 LLM thinking...\033[0m")
 
+        # Log the actual prompts being sent to the LLM
+        if prompts and len(prompts) > 0:
+            for i, prompt in enumerate(prompts):
+                prompt_logger = logging.getLogger("prompts")
+                # Only log a truncated version to avoid spam, but make it configurable
+                if len(str(prompt)) > 500:
+                    truncated = (
+                        str(prompt)[:300] + "...[TRUNCATED]..." + str(prompt)[-100:]
+                    )
+                    prompt_logger.debug(f"📝 PROMPT TO LLM #{i+1}: {truncated}")
+                else:
+                    prompt_logger.debug(f"📝 PROMPT TO LLM #{i+1}: {prompt}")
+
     def on_llm_end(self, response, **kwargs):
         """Called when LLM ends."""
         self.logger.debug("\033[1;90m💭 LLM response received\033[0m")
+
+        # Log LLM response details - THIS IS WHERE THE ORCHESTRATOR THINKING HAPPENS
+        if hasattr(response, "generations") and response.generations:
+            llm_logger = logging.getLogger("llm.response")
+            orchestrator_thinking_logger = logging.getLogger("orchestrator.thinking")
+
+            for i, generation in enumerate(response.generations):
+                if hasattr(generation, "text"):
+                    response_text = generation.text
+
+                    # Extract and log the full orchestrator thinking process
+                    if response_text.strip():
+                        orchestrator_thinking_logger.info(
+                            f"🧠 FULL ORCHESTRATOR LLM RESPONSE #{i+1}:"
+                        )
+                        orchestrator_thinking_logger.info(f"{'='*50}")
+                        orchestrator_thinking_logger.info(response_text)
+                        orchestrator_thinking_logger.info(f"{'='*50}")
+
+                        # Also parse out specific thought patterns
+                        lines = response_text.split("\n")
+                        for line in lines:
+                            line = line.strip()
+                            if line.startswith("Thought:"):
+                                thought = line.replace("Thought:", "").strip()
+                                orchestrator_thinking_logger.info(
+                                    f"💭 ORCHESTRATOR REASONING: {thought}"
+                                )
+
+                    # Keep the original truncated logging for general LLM logger
+                    if len(response_text) > 300:
+                        truncated = (
+                            response_text[:150]
+                            + "...[TRUNCATED]..."
+                            + response_text[-100:]
+                        )
+                        llm_logger.debug(f"🤖 LLM RESPONSE #{i+1}: {truncated}")
+                    else:
+                        llm_logger.debug(f"🤖 LLM RESPONSE #{i+1}: {response_text}")
 
 
 def get_operator_agents() -> List[Any]:

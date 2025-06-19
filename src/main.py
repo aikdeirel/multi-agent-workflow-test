@@ -131,6 +131,29 @@ async def lifespan(app: FastAPI):
         # Configure logging level
         logging.getLogger().setLevel(getattr(logging, settings.log_level.upper()))
 
+        # Set specific loggers for enhanced multi-agent logging
+        logging.getLogger("orchestrator").setLevel(logging.INFO)
+        logging.getLogger("orchestrator.thinking").setLevel(
+            logging.INFO
+        )  # NEW: Show orchestrator LLM thinking
+        logging.getLogger("operators").setLevel(logging.INFO)
+        logging.getLogger("operators.weather_operator_agent").setLevel(logging.INFO)
+        logging.getLogger("operators.math_operator_agent").setLevel(logging.INFO)
+        logging.getLogger("operators.weather_internal").setLevel(logging.INFO)
+        logging.getLogger("operators.math_internal").setLevel(logging.INFO)
+        logging.getLogger("operators.response").setLevel(logging.INFO)
+        logging.getLogger("operators.error").setLevel(logging.INFO)
+
+        # Enable prompt and LLM response logging in debug mode
+        if settings.log_level.upper() == "DEBUG":
+            logging.getLogger("prompts").setLevel(logging.DEBUG)
+            logging.getLogger("llm.response").setLevel(logging.DEBUG)
+        else:
+            logging.getLogger("prompts").setLevel(
+                logging.INFO
+            )  # Show prompts in INFO level too
+            logging.getLogger("llm.response").setLevel(logging.INFO)
+
         # Initialize Langfuse cloud client
         try:
             langfuse_config = load_json_setting("langfuse_config")
@@ -266,6 +289,10 @@ async def invoke_agent(request: InvokeRequest):
 
     logger.info(f"Processing request {request_id} for session {session_id}")
 
+    # Log the user prompt prominently
+    logger.info(f"📝 USER PROMPT: {request.input}")
+    logger.info(f"🔄 Starting multi-agent workflow processing...")
+
     # Create Langfuse trace with proper hierarchy for v3
     trace = None
     if app_state["langfuse_client"]:
@@ -393,7 +420,9 @@ async def invoke_agent(request: InvokeRequest):
             },
         )
 
-        logger.info(f"Request {request_id} completed successfully")
+        # Log final completion
+        logger.info(f"🏁 FINAL ORCHESTRATOR RESPONSE: {output[:200]}...")
+        logger.info(f"✅ Request {request_id} completed successfully")
         return response
 
     except HTTPException:
