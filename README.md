@@ -253,41 +253,6 @@ Execute orchestrator with user input - it will delegate to appropriate specialis
 - `prompts/weather_operator_system.md`: Weather specialist system prompt  
 - `prompts/math_operator_system.md`: Math specialist system prompt
 
-## Example Multi-Agent Interactions
-
-### Weather Comparison Request
-```
-User: "Compare weather in Tokyo vs Seoul, which city has better weather?"
-
-Flow:
-1. Orchestrator → Weather Operator: "Get weather for Tokyo"
-2. Weather Operator → Returns Tokyo weather data
-3. Orchestrator → Weather Operator: "Get weather for Seoul"  
-4. Weather Operator → Returns Seoul weather data
-5. Orchestrator → Compares results and provides recommendation
-```
-
-### Mathematical Problem
-```
-User: "Calculate (15 + 25) * 3 and explain each step"
-
-Flow:
-1. Orchestrator → Math Operator: "Calculate (15 + 25) * 3"
-2. Math Operator → Uses calculator tool → Returns 120
-3. Orchestrator → Formats response with step-by-step explanation
-```
-
-### Complex Multi-Domain Request
-```
-User: "What's weather in Berlin and calculate how many days until Christmas"
-
-Flow:
-1. Orchestrator → Weather Operator: "Get weather for Berlin"
-2. Weather Operator → Returns Berlin weather
-3. Orchestrator → Math Operator: "Calculate days until Christmas"
-4. Math Operator → Returns calculation
-5. Orchestrator → Combines both results in final response
-```
 
 ## Monitoring & Analytics
 

@@ -13,6 +13,7 @@ from config import load_json_setting
 from prompt_manager import get_prompt_manager
 from operators.weather_operator_agent import weather_operator
 from operators.math_operator_agent import math_operator
+from operators.datetime_operator_agent import datetime_operator
 
 logger = logging.getLogger(__name__)
 
@@ -197,7 +198,7 @@ def get_operator_agents() -> List[Any]:
     """
     try:
         # Return the operator agent tools
-        operators = [weather_operator, math_operator]
+        operators = [weather_operator, math_operator, datetime_operator]
 
         logger.info(f"Loaded {len(operators)} operator agents:")
         for op in operators:
