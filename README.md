@@ -290,7 +290,7 @@ The system automatically sends traces to Langfuse Cloud for:
 
 - 📊 **Multi-Agent Tracing**: See delegation flow between orchestrator and operators
 - 🔍 **Agent Debugging**: Step-by-step execution visibility for each agent
-- 💰 **Cost Monitoring**: Token usage across all agents
+- 💰 **Tracing & Monitoring**: Request tracking and execution visibility across all agents
 - 📈 **Performance Analytics**: Response times for delegations
 - 🏷️ **Session Grouping**: Multi-turn conversation insights
 - 🛠️ **Tool Usage**: Track which tools each operator uses
