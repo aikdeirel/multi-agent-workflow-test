@@ -104,6 +104,8 @@ Here's a real example of how the system handles complex requests:
 - [Langfuse Cloud Account](https://cloud.langfuse.com) (free tier available)
 - [Mistral API Key](https://console.mistral.ai/) (for LLM integration)
 
+**🤖 LLM Support**: This project currently supports **Mistral LLM API only**. Other LLM providers are not supported at this time.
+
 ## Quick Start
 
 ### 1. Get Langfuse Cloud Credentials
@@ -135,6 +137,8 @@ LANGFUSE_HOST=https://cloud.langfuse.com
 
 # Mistral API Configuration
 MISTRAL_API_KEY=your_mistral_api_key_here
+# Mistral model to use (default: mistral-medium-latest - recommended)
+MISTRAL_MODEL=mistral-medium-latest
 
 # Application Configuration
 LOG_LEVEL=INFO
@@ -238,6 +242,7 @@ Execute orchestrator with user input - it will delegate to appropriate specialis
 | `LANGFUSE_SECRET_KEY` | Langfuse secret key | Yes | - |
 | `LANGFUSE_HOST` | Langfuse host URL | No | `https://cloud.langfuse.com` |
 | `MISTRAL_API_KEY` | Mistral API key | Yes | - |
+| `MISTRAL_MODEL` | Mistral model name | No | `mistral-medium-latest` |
 | `LOG_LEVEL` | Logging level | No | `INFO` |
 
 ### Configuration Files

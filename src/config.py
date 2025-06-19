@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     # LLM settings
     mistral_api_key: str = Field(env="MISTRAL_API_KEY")
+    mistral_model: str = Field(default="mistral-medium-latest", env="MISTRAL_MODEL")
 
     # Application settings
     log_level: str = Field(default="INFO", env="LOG_LEVEL")

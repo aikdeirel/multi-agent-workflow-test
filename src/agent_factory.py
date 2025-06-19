@@ -105,7 +105,7 @@ def get_operator_agents() -> List[Any]:
 
 def create_llm_from_config() -> ChatMistralAI:
     """
-    Create and configure the LLM based on JSON configuration.
+    Create and configure the LLM based on environment variables and JSON configuration.
 
     Returns:
         Configured ChatMistralAI instance
@@ -115,11 +115,16 @@ def create_llm_from_config() -> ChatMistralAI:
         RuntimeError: If LLM creation fails
     """
     try:
-        # Load model configuration
+        # Load model configuration from JSON (for other settings)
         model_config = load_json_setting("model_config")
 
+        # Get settings from environment variables
+        from config import get_global_settings
+
+        settings = get_global_settings()
+
         # Validate required configuration
-        required_keys = ["model_name", "temperature", "max_tokens", "timeout"]
+        required_keys = ["temperature", "max_tokens", "timeout"]
         missing_keys = [key for key in required_keys if key not in model_config]
         if missing_keys:
             raise ValueError(
@@ -127,16 +132,16 @@ def create_llm_from_config() -> ChatMistralAI:
             )
 
         # Create LLM instance with Mistral-compatible configuration
-        # Note: We'll handle LLM tracing manually within our main trace rather than using callbacks
+        # Use model name from environment, other settings from JSON
         llm = ChatMistralAI(
-            model=model_config["model_name"],
+            model=settings.mistral_model,
             temperature=model_config["temperature"],
             max_tokens=model_config["max_tokens"],
             timeout=model_config["timeout"],
         )
 
         logger.info(
-            f"Created LLM with model: {model_config['model_name']} (manual tracing)"
+            f"Created LLM with model: {settings.mistral_model} (from environment)"
         )
         return llm
 

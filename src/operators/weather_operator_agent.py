@@ -141,9 +141,12 @@ def weather_operator(query: str) -> str:
                 logger.info("✅ Created weather operator span")
 
                 # Create LLM for the weather operator
+                from config import get_global_settings
+
+                settings = get_global_settings()
                 model_config = load_json_setting("model_config")
                 llm = ChatMistralAI(
-                    model=model_config["model_name"],
+                    model=settings.mistral_model,
                     temperature=model_config["temperature"],
                     max_tokens=model_config["max_tokens"],
                     timeout=model_config["timeout"],
@@ -178,9 +181,12 @@ def weather_operator(query: str) -> str:
             logger.warning(f"Langfuse tracing not available: {e}")
 
             # Fallback execution without tracing
+            from config import get_global_settings
+
+            settings = get_global_settings()
             model_config = load_json_setting("model_config")
             llm = ChatMistralAI(
-                model=model_config["model_name"],
+                model=settings.mistral_model,
                 temperature=model_config["temperature"],
                 max_tokens=model_config["max_tokens"],
                 timeout=model_config["timeout"],

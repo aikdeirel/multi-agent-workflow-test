@@ -1,5 +1,5 @@
 {
-    "model_name": "mistral-medium-latest",
+    "_comment": "Model name is now controlled by MISTRAL_MODEL environment variable",
     "temperature": 0.1,
     "max_tokens": 4000,
     "timeout": 30
