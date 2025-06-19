@@ -1,32 +1,102 @@
-# Multi-Agent Workflow System
+# Multi-Agent Orchestration System
 
 **⚠️ EXPERIMENTAL PROJECT - FOR LEARNING & TESTING PURPOSES ONLY**
 
 This is a personal experiment and educational project for exploring multi-agent systems, LangChain, and AI workflow patterns. This project is **NOT intended for production use** and is purely for experimentation, testing, and self-education purposes.
 
-A sophisticated stateless multi-agent system built with LangChain and monitored with Langfuse Cloud for learning AI workflow concepts.
+A sophisticated multi-agent orchestration system that demonstrates true delegation patterns between specialized AI agents, built with LangChain and monitored with Langfuse Cloud.
 
-## Features
+## Multi-Agent Architecture Overview
 
-- 🤖 **Multi-Agent Architecture**: Orchestrated agent system with specialized tools
-- 📊 **Cloud Monitoring**: Integrated with [Langfuse Cloud](https://langfuse.com) for comprehensive tracing and analytics
-- 🔧 **Flexible Tools**: Extensible tool system for various operations
-- 🧪 **Experimental**: Containerized deployment for testing and learning
-- 🛡️ **Type Safety**: Full TypeScript-style validation with Pydantic
+This system implements a **true multi-agent delegation pattern** where:
+
+1. **Main Orchestrator Agent** - Receives user requests and delegates to specialized operators
+2. **Weather Operator Agent** - Specialized agent for weather-related tasks with weather tools
+3. **Math Operator Agent** - Specialized agent for mathematical calculations with math tools
+
+### How the Multi-Agent System Works
+
+Here's a real example of how the system handles complex requests:
+
+**User**: *"What's the weather in Berlin and Munich? Compare the results and tell me which is better."*
+
+**System Flow**:
+1. **Orchestrator**: "I need weather for Berlin and Munich but cannot get weather myself. Let me ask the weather operator for Berlin first."
+   - Delegates to Weather Operator: "Get weather for Berlin"
+
+2. **Weather Operator**: "You want weather for Berlin? I'll use my weather tools."
+   - Uses `get_current_weather` tool → Gets Berlin weather data
+   - Returns: "Here's the weather for Berlin: 15°C, cloudy, 60% humidity..."
+
+3. **Orchestrator**: "Great! Now I need Munich weather too. Let me ask the weather operator for Munich."
+   - Delegates to Weather Operator: "Get weather for Munich"
+
+4. **Weather Operator**: "You want weather for Munich? I'll use my weather tools."
+   - Uses `get_current_weather` tool → Gets Munich weather data  
+   - Returns: "Here's the weather for Munich: 18°C, sunny, 45% humidity..."
+
+5. **Orchestrator**: "Perfect! Now I have both weather reports. I can compare them myself."
+   - Analyzes both results internally
+   - Returns: "Based on the weather data, Munich has better weather today with warmer temperatures (18°C vs 15°C), sunny conditions vs cloudy, and lower humidity."
+
+### Key Features
+
+- 🤖 **True Agent Delegation**: Orchestrator delegates to specialized agents, never performs tasks directly
+- 🔧 **Specialized Tools**: Each operator has domain-specific tools (weather APIs, math calculators)
+- 📊 **Cloud Monitoring**: Integrated with [Langfuse Cloud](https://langfuse.com) for comprehensive tracing
+- 🧪 **Extensible**: Easy to add new operator agents and tools
+- ⚡ **Sequential Processing**: Handles complex multi-step requests through proper delegation
+- 🛡️ **Type Safety**: Full validation with Pydantic
 - 📈 **Stateless Design**: No local data persistence required
-- ⚡ **Lightweight**: Minimal infrastructure dependencies
 
-## Architecture
+## Architecture Diagram
 
 ```
-┌─────────────────┐    ┌─────────────────┐
-│   FastAPI App   │    │ Langfuse Cloud  │
-│                 │────│   (External)    │
-│ Multi-Agent     │    │                 │
-│ System          │    │ Traces &        │
-│ (Stateless)     │    │ Analytics       │
-└─────────────────┘    └─────────────────┘
+┌─────────────────────┐    ┌─────────────────────┐
+│   Main Orchestrator │    │    Langfuse Cloud   │
+│       Agent         │────│   (Monitoring)      │
+│                     │    │                     │
+└──────────┬──────────┘    └─────────────────────┘
+           │
+           │ delegates to
+           │
+┌──────────▼──────────┐    ┌─────────────────────┐    ┌─────────────────────┐
+│  Weather Operator   │    │   Math Operator     │    │  [Future Operator]  │
+│      Agent          │    │      Agent          │    │      Agent          │
+│                     │    │                     │    │                     │
+│ ┌─────────────────┐ │    │ ┌─────────────────┐ │    │ ┌─────────────────┐ │
+│ │  Weather Tools  │ │    │ │   Math Tools    │ │    │ │  Custom Tools   │ │
+│ │ • Current       │ │    │ │ • Calculator    │ │    │ │ • Database      │ │
+│ │ • Forecast      │ │    │ │ • Expression    │ │    │ │ • Files         │ │
+│ │ • Geocoding     │ │    │ │   Evaluator     │ │    │ │ • API Calls     │ │
+│ └─────────────────┘ │    │ └─────────────────┘ │    │ │ • ...           │ │
+└─────────────────────┘    └─────────────────────┘    │ └─────────────────┘ │
+                                                      └─────────────────────┘
+                                                            ⬆ Easily
+                                                          Extensible
 ```
+
+## Available Agents & Tools
+
+### Main Orchestrator Agent
+- **Role**: Central coordinator and task delegator
+- **Capabilities**: Understands user intent, delegates to specialists, combines results
+- **Never**: Performs calculations or weather lookups directly
+
+### Weather Operator Agent  
+- **Role**: Weather specialist with weather tools
+- **Tools**:
+  - `get_current_weather` - Real-time weather data
+  - `get_weather_forecast` - Multi-day forecasts
+  - `weather_help` - Weather information guidance
+- **Data Source**: Open-Meteo API (free, no API key required)
+
+### Math Operator Agent
+- **Role**: Mathematics specialist with calculation tools  
+- **Tools**:
+  - `calculate` - Safe mathematical expression evaluation
+  - `math_help` - Mathematical guidance
+- **Features**: Supports arithmetic, functions, order of operations
 
 ## Prerequisites
 
@@ -80,14 +150,38 @@ docker-compose up -d
 curl http://localhost:8000/health
 ```
 
-### 4. Test the Agent
+### 4. Test the Multi-Agent System
 
 ```bash
-# Example request
+# Simple weather request
 curl -X POST "http://localhost:8000/invoke" \
   -H "Content-Type: application/json" \
   -d '{
-    "input": "Calculate 15 * 23 and explain the result",
+    "input": "What is the weather in London?",
+    "session_id": "test-session"
+  }'
+
+# Multi-step weather comparison
+curl -X POST "http://localhost:8000/invoke" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": "Compare weather between Paris and Rome, which is better?",
+    "session_id": "test-session"
+  }'
+
+# Mathematical calculation
+curl -X POST "http://localhost:8000/invoke" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": "Calculate 15 * 23 + 47 and explain the steps",
+    "session_id": "test-session"
+  }'
+
+# Complex multi-agent request
+curl -X POST "http://localhost:8000/invoke" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": "Get weather for Berlin and calculate 25 * 4, then tell me both results",
     "session_id": "test-session"
   }'
 ```
@@ -98,19 +192,19 @@ curl -X POST "http://localhost:8000/invoke" \
 ```
 GET /health
 ```
-Returns system health status and metrics.
+Returns system health status and agent information.
 
 ### Agent Information
 ```
 GET /agent/info
 ```
-Returns detailed information about the agent configuration.
+Returns detailed information about the orchestrator and available operators.
 
-### Invoke Agent
+### Invoke Multi-Agent System
 ```
 POST /invoke
 ```
-Execute agent with user input.
+Execute orchestrator with user input - it will delegate to appropriate specialist agents.
 
 **Request Body:**
 ```json
@@ -126,11 +220,11 @@ Execute agent with user input.
 **Response:**
 ```json
 {
-  "output": "Agent response",
+  "output": "Orchestrator's final response after agent delegation",
   "session_id": "session-id",
   "request_id": "unique-request-id",
-  "intermediate_steps": [...],
-  "metadata": {...}
+  "intermediate_steps": ["Delegation steps and operator responses"],
+  "metadata": {"agent_info": "orchestrator details"}
 }
 ```
 
@@ -148,26 +242,58 @@ Execute agent with user input.
 
 ### Configuration Files
 
-- `settings/model_config.json`: LLM model configuration
+- `settings/model_config.json`: LLM model configuration (Mistral)
 - `settings/langfuse_config.json`: Langfuse client settings
-- `prompts/main_orchestrator_system.md`: Main agent system prompt
+- `prompts/main_orchestrator_system.md`: Main orchestrator system prompt
+- `prompts/weather_operator_system.md`: Weather specialist system prompt  
+- `prompts/math_operator_system.md`: Math specialist system prompt
 
-## Available Tools
+## Example Multi-Agent Interactions
 
-The system currently includes the following tools:
+### Weather Comparison Request
+```
+User: "Compare weather in Tokyo vs Seoul, which city has better weather?"
 
-- **Math Operator**: Performs basic mathematical calculations
-- **Extensible Framework**: Easy to add new tools via the `src/tools/operators/` directory
+Flow:
+1. Orchestrator → Weather Operator: "Get weather for Tokyo"
+2. Weather Operator → Returns Tokyo weather data
+3. Orchestrator → Weather Operator: "Get weather for Seoul"  
+4. Weather Operator → Returns Seoul weather data
+5. Orchestrator → Compares results and provides recommendation
+```
+
+### Mathematical Problem
+```
+User: "Calculate (15 + 25) * 3 and explain each step"
+
+Flow:
+1. Orchestrator → Math Operator: "Calculate (15 + 25) * 3"
+2. Math Operator → Uses calculator tool → Returns 120
+3. Orchestrator → Formats response with step-by-step explanation
+```
+
+### Complex Multi-Domain Request
+```
+User: "What's weather in Berlin and calculate how many days until Christmas"
+
+Flow:
+1. Orchestrator → Weather Operator: "Get weather for Berlin"
+2. Weather Operator → Returns Berlin weather
+3. Orchestrator → Math Operator: "Calculate days until Christmas"
+4. Math Operator → Returns calculation
+5. Orchestrator → Combines both results in final response
+```
 
 ## Monitoring & Analytics
 
 The system automatically sends traces to Langfuse Cloud for:
 
-- 📊 **Request Tracking**: Every API call is traced
-- 🔍 **Agent Debugging**: Step-by-step execution visibility  
-- 💰 **Cost Monitoring**: Token usage and cost tracking
-- 📈 **Performance Analytics**: Response times and success rates
-- 🏷️ **Session Grouping**: Conversation-level insights
+- 📊 **Multi-Agent Tracing**: See delegation flow between orchestrator and operators
+- 🔍 **Agent Debugging**: Step-by-step execution visibility for each agent
+- 💰 **Cost Monitoring**: Token usage across all agents
+- 📈 **Performance Analytics**: Response times for delegations
+- 🏷️ **Session Grouping**: Multi-turn conversation insights
+- 🛠️ **Tool Usage**: Track which tools each operator uses
 
 Access your traces at: [cloud.langfuse.com](https://cloud.langfuse.com)
 
@@ -184,43 +310,36 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### Adding New Tools
+### Adding New Operator Agents
 
-1. Create tool in `src/tools/operators/`
-2. Register in `src/tools/factory.py`
-3. Update agent configuration if needed
+1. Create new operator agent in `src/operators/`
+2. Create tools in `src/tools/operators/`
+3. Add system prompt in `prompts/`
+4. Register in `src/agent_factory.py`
+5. Add tool import to orchestrator
 
-### Extending Agents
+### Extending the System
 
-The system supports multiple agent types. See `src/agent_factory.py` for examples.
+The architecture supports easy extension:
+- **New Agents**: Add specialists for other domains (database, file system, etc.)
+- **New Tools**: Extend existing operators with additional capabilities
+- **Custom Prompts**: Modify agent behavior via prompt engineering
 
 ## Important Notes
 
 ### Experimental Nature
 
 This project is designed for:
-- 🧪 **Learning**: Understanding multi-agent architectures
-- 🔬 **Experimentation**: Testing AI workflow patterns
-- 📚 **Education**: Personal skill development in LangChain and AI systems
-- 🛠️ **Prototyping**: Rapid testing of AI agent concepts
+- 🧪 **Learning**: Understanding multi-agent delegation patterns
+- 🔬 **Experimentation**: Testing AI orchestration concepts
+- 📚 **Education**: Personal skill development in LangChain and multi-agent systems
+- 🛠️ **Prototyping**: Rapid testing of agent coordination patterns
 
 ### Not Suitable For:
 - ❌ Production deployments
 - ❌ Commercial applications  
 - ❌ Mission-critical systems
 - ❌ Handling sensitive data
-
-### Docker Compose Override
-
-For production, create `docker-compose.override.yml`:
-
-```yaml
-services:
-  app:
-    environment:
-      - LOG_LEVEL=WARNING
-    restart: unless-stopped
-```
 
 ## Troubleshooting
 
@@ -231,22 +350,26 @@ services:
    - Check internet connectivity
    - Ensure correct region (EU/US)
 
-2. **Agent Tools Not Loading**
-   - Check tool dependencies
-   - Verify tool registration in factory
+2. **Agent Delegation Not Working**
+   - Check operator agent registration
+   - Verify tool imports
+   - Review system prompts
 
-3. **Mistral API Issues**
-   - Verify API key is valid
-   - Check API rate limits
-   - Ensure network connectivity
+3. **Weather Data Unavailable**
+   - Open-Meteo API requires internet access
+   - Location geocoding may fail for invalid locations
+
+4. **Math Calculations Failing**
+   - Check expression syntax
+   - Verify calculator tool is loaded
 
 ### Logs
 
 ```bash
-# View application logs
+# View application logs with agent delegation traces
 docker-compose logs app
 
-# Follow logs in real-time
+# Follow logs in real-time to see agent interactions
 docker-compose logs -f app
 ```
 
@@ -255,7 +378,7 @@ docker-compose logs -f app
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
+4. Test with various multi-agent scenarios
 5. Submit a pull request
 
 ## License
