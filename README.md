@@ -290,7 +290,6 @@ The system automatically sends traces to Langfuse Cloud for:
 
 - 📊 **Multi-Agent Tracing**: See delegation flow between orchestrator and operators
 - 🔍 **Agent Debugging**: Step-by-step execution visibility for each agent
-- 💰 **Tracing & Monitoring**: Request tracking and execution visibility across all agents
 - 📈 **Performance Analytics**: Response times for delegations
 - 🏷️ **Session Grouping**: Multi-turn conversation insights
 - 🛠️ **Tool Usage**: Track which tools each operator uses
@@ -299,24 +298,18 @@ Access your traces at: [cloud.langfuse.com](https://cloud.langfuse.com)
 
 ## Development
 
-### Local Development
-
-```bash
-# Install dependencies
-cd src
-pip install -r requirements.txt
-
-# Run locally (requires environment setup)
-python main.py
-```
-
 ### Adding New Operator Agents
 
 1. Create new operator agent in `src/operators/`
 2. Create tools in `src/tools/operators/`
 3. Add system prompt in `prompts/`
-4. Register in `src/agent_factory.py`
-5. Add tool import to orchestrator
+4. Add import and register in `src/agent_factory.py`:
+   ```python
+   from operators.your_new_operator_agent import your_operator
+   
+   # Then add to the operators list in get_operator_agents()
+   operators = [weather_operator, math_operator, your_operator]
+   ```
 
 ### Extending the System
 
@@ -383,10 +376,9 @@ docker-compose logs -f app
 
 ## License
 
-MIT License - see LICENSE file for details.
+This project is provided as-is for educational and experimental purposes.
 
 ## Support
 
 - 📚 [Langfuse Documentation](https://langfuse.com/docs)
 - 🐛 [Report Issues](https://github.com/yourusername/multi-agent-workflow-test/issues)
-- 💬 [Discussion Forum](https://github.com/yourusername/multi-agent-workflow-test/discussions) 
