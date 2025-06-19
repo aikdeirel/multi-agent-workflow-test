@@ -7,12 +7,77 @@ from langchain.agents import create_react_agent, AgentExecutor
 from langchain.prompts import PromptTemplate
 from langchain_mistralai import ChatMistralAI
 from langfuse import Langfuse
+from langchain.callbacks.base import BaseCallbackHandler
 
 from config import load_json_setting
 from prompt_manager import get_prompt_manager
 from tools.factory import validate_tool
 
 logger = logging.getLogger(__name__)
+
+
+class ProperLoggingCallback(BaseCallbackHandler):
+    """Custom callback handler for agent actions with rich verbose output and proper formatting."""
+
+    def __init__(self):
+        super().__init__()
+        self.logger = logging.getLogger("agent_executor")
+
+    def on_chain_start(self, serialized, inputs, **kwargs):
+        """Called when chain starts."""
+        self.logger.info("")
+        self.logger.info("🚀 \033[1;36m> Entering new AgentExecutor chain...\033[0m")
+
+    def on_agent_action(self, action, **kwargs):
+        """Called when agent takes an action."""
+        self.logger.info(f"\033[1;32mAction:\033[0m {action.tool}")
+        self.logger.info(f"\033[1;32mAction Input:\033[0m {action.tool_input}")
+
+    def on_tool_start(self, serialized, input_str, **kwargs):
+        """Called when tool starts."""
+        tool_name = serialized.get("name", "Unknown Tool")
+        self.logger.info(f"\033[1;33m⚡ Starting tool '{tool_name}'\033[0m")
+
+    def on_tool_end(self, output, **kwargs):
+        """Called when tool ends."""
+        # Format tool output with proper line breaks and color
+        formatted_output = str(output).strip()
+        self.logger.info(f"\033[1;34mObservation:\033[0m {formatted_output}")
+
+    def on_tool_error(self, error, **kwargs):
+        """Called when tool encounters an error."""
+        self.logger.error(f"\033[1;31m❌ Tool error:\033[0m {str(error)}")
+
+    def on_agent_finish(self, finish, **kwargs):
+        """Called when agent finishes."""
+        final_output = finish.return_values.get("output", "No output")
+        self.logger.info(f"\033[1;35mFinal Answer:\033[0m {final_output}")
+
+    def on_chain_end(self, outputs, **kwargs):
+        """Called when chain ends."""
+        self.logger.info("")
+        self.logger.info("✅ \033[1;36m> Finished chain.\033[0m")
+
+    def on_text(self, text, **kwargs):
+        """Called on arbitrary text - this captures the agent's thinking."""
+        # Only log non-empty text that's not just whitespace
+        if text and text.strip():
+            text_stripped = text.strip()
+            # Filter out some verbose internal text but keep the thinking
+            if not any(skip in text_stripped for skip in ["Invoking:", "Got output"]):
+                # Check if this is a "Thought:" line and color it appropriately
+                if text_stripped.startswith("Thought:"):
+                    self.logger.info(f"\033[1;37m{text_stripped}\033[0m")
+                else:
+                    self.logger.info(f"{text_stripped}")
+
+    def on_llm_start(self, serialized, prompts, **kwargs):
+        """Called when LLM starts."""
+        self.logger.debug("\033[1;90m🧠 LLM thinking...\033[0m")
+
+    def on_llm_end(self, response, **kwargs):
+        """Called when LLM ends."""
+        self.logger.debug("\033[1;90m💭 LLM response received\033[0m")
 
 
 def discover_and_load_tools(
@@ -239,13 +304,14 @@ def create_orchestrator_agent(
         executor = AgentExecutor(
             agent=agent,
             tools=tools,
-            verbose=True,
+            verbose=False,  # Disable built-in verbose to use our custom callback
             max_iterations=10,
             max_execution_time=300,  # 5 minutes timeout
             return_intermediate_steps=True,
             handle_parsing_errors=True,
             # Add early stopping to prevent infinite loops
             early_stopping_method="generate",
+            callbacks=[ProperLoggingCallback()],  # Add our custom callback
         )
 
         logger.info("Orchestrator agent created successfully")

@@ -14,10 +14,58 @@ from langfuse import Langfuse
 from config import get_global_settings, load_json_setting
 from agent_factory import create_orchestrator_agent, get_agent_info
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+
+class ColoredFormatter(logging.Formatter):
+    """Custom formatter to add colors to log levels."""
+
+    # ANSI color codes
+    COLORS = {
+        "DEBUG": "\033[36m",  # Cyan
+        "INFO": "\033[32m",  # Green
+        "WARNING": "\033[33m",  # Yellow
+        "ERROR": "\033[31m",  # Red
+        "CRITICAL": "\033[35m",  # Magenta
+    }
+    RESET = "\033[0m"  # Reset to default color
+
+    def format(self, record):
+        # Get the original formatted message
+        log_message = super().format(record)
+
+        # Add color to the log level
+        level_name = record.levelname
+        if level_name in self.COLORS:
+            colored_level = f"{self.COLORS[level_name]}{level_name}{self.RESET}"
+            # Replace the level name in the message with the colored version
+            log_message = log_message.replace(level_name, colored_level, 1)
+
+        return log_message
+
+
+# Configure colorful logging
+def setup_colored_logging():
+    """Setup colorful logging configuration."""
+    # Create colored formatter
+    formatter = ColoredFormatter(
+        fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
+    # Get root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+
+    # Remove any existing handlers
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+
+    # Create console handler with colored formatter
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    root_logger.addHandler(console_handler)
+
+
+# Setup colored logging
+setup_colored_logging()
 logger = logging.getLogger(__name__)
 
 # Initialize Langfuse client early for @observe decorators

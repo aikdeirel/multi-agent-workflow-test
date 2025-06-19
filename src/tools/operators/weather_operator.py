@@ -319,11 +319,11 @@ def get_weather_forecast(location: str, days: int = 7) -> str:
     try:
         # Validate days parameter
         if not isinstance(days, int) or days < 1 or days > 16:
-            return "Error: Number of days must be between 1 and 16."
+            return "Error: Number of days must be between 1 and 16.\n"
 
         # Parse location input
         if not location or not isinstance(location, str):
-            return "Error: Please provide a valid location name or coordinates."
+            return "Error: Please provide a valid location name or coordinates.\n"
 
         # Handle case where LangChain passes JSON string instead of raw location
         import json
@@ -354,12 +354,12 @@ def get_weather_forecast(location: str, days: int = 7) -> str:
                     "name": f"Coordinates ({latitude}, {longitude})",
                 }
             except ValueError:
-                return "Error: Invalid coordinate format. Use 'latitude,longitude' (e.g., '52.52,13.41')"
+                return "Error: Invalid coordinate format. Use 'latitude,longitude' (e.g., '52.52,13.41')\n"
         else:
             # Geocode location name
             location_info = geocode_location(actual_location)
             if not location_info:
-                return f"Error: Could not find coordinates for location '{actual_location}'. Please check the spelling or try a different location."
+                return f"Error: Could not find coordinates for location '{actual_location}'. Please check the spelling or try a different location.\n"
 
         # Prepare API parameters
         params = {
@@ -431,16 +431,16 @@ def get_weather_forecast(location: str, days: int = 7) -> str:
             f"Successfully retrieved forecast for {location_info.get('name', actual_location)}"
         )
 
-        return formatted_response
+        return formatted_response + "\n"
 
     except requests.exceptions.RequestException as e:
         error_msg = f"Error fetching weather forecast: Network error - {str(e)}"
         logger.error(f"Network error for location {location}: {str(e)}")
-        return error_msg
+        return error_msg + "\n"
     except Exception as e:
         error_msg = f"Error: An unexpected error occurred while fetching weather forecast. {str(e)}"
         logger.error(f"Unexpected error for location {location}: {str(e)}")
-        return error_msg
+        return error_msg + "\n"
 
 
 @tool
@@ -506,4 +506,4 @@ ERROR HANDLING:
 
 Ask me for weather information for any location worldwide!"""
 
-    return help_text
+    return help_text + "\n"
