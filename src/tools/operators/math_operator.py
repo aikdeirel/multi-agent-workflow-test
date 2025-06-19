@@ -136,7 +136,6 @@ def validate_math_expression(expression: str) -> str:
 
 
 @tool
-@observe()
 def calculate(expression: str) -> str:
     """
     Perform mathematical calculations on expressions.
@@ -206,7 +205,7 @@ def calculate(expression: str) -> str:
         else:
             formatted_result = str(result)
 
-        response = f"Result: {formatted_result}\n\nCalculation: {clean_expression} = {formatted_result}"
+        response = f"The calculation result is {formatted_result}, as {clean_expression} = {formatted_result}."
 
         logger.info(f"Calculation successful: {clean_expression} = {formatted_result}")
         return response
@@ -228,7 +227,6 @@ def calculate(expression: str) -> str:
 
 
 @tool
-@observe()
 def math_help() -> str:
     """
     Get help and information about mathematical operations and functions available.

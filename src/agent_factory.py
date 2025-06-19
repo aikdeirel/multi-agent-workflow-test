@@ -103,6 +103,7 @@ def create_llm_from_config() -> ChatMistralAI:
             )
 
         # Create LLM instance with Mistral-compatible configuration
+        # Note: We'll handle LLM tracing manually within our main trace rather than using callbacks
         llm = ChatMistralAI(
             model=model_config["model_name"],
             temperature=model_config["temperature"],
@@ -110,7 +111,9 @@ def create_llm_from_config() -> ChatMistralAI:
             timeout=model_config["timeout"],
         )
 
-        logger.info(f"Created LLM with model: {model_config['model_name']}")
+        logger.info(
+            f"Created LLM with model: {model_config['model_name']} (manual tracing)"
+        )
         return llm
 
     except Exception as e:
@@ -148,7 +151,7 @@ You have access to the following tools:
 
 {{tools}}
 
-Use the following format:
+To use a tool, you MUST use this EXACT format:
 
 Question: the input question you must answer
 Thought: you should always think about what to do
@@ -158,6 +161,12 @@ Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can repeat N times)
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
+
+IMPORTANT RULES:
+- You must EITHER generate an Action OR a Final Answer, NEVER both in the same response
+- If you need to use a tool, generate Action and Action Input, then wait for Observation
+- Only generate Final Answer when you have all the information needed to answer the question
+- Do not include example text like "[After receiving the tool response]" in your actual response
 
 Begin!
 
@@ -235,6 +244,8 @@ def create_orchestrator_agent(
             max_execution_time=300,  # 5 minutes timeout
             return_intermediate_steps=True,
             handle_parsing_errors=True,
+            # Add early stopping to prevent infinite loops
+            early_stopping_method="generate",
         )
 
         logger.info("Orchestrator agent created successfully")
@@ -259,25 +270,32 @@ def get_agent_info(executor: AgentExecutor) -> dict:
     """
     try:
         tools_info = []
-        for tool in executor.tools:
-            tools_info.append(
-                {
-                    "name": tool.name,
-                    "description": (
-                        tool.description[:100] + "..."
-                        if len(tool.description) > 100
-                        else tool.description
-                    ),
-                }
-            )
+        if executor.tools:
+            for tool in executor.tools:
+                tools_info.append(
+                    {
+                        "name": tool.name,
+                        "description": (
+                            tool.description[:100] + "..."
+                            if tool.description and len(tool.description) > 100
+                            else tool.description
+                        ),
+                    }
+                )
+
+        # Safely handle callbacks - they might be None
+        callbacks_count = 0
+        if hasattr(executor, "callbacks") and executor.callbacks is not None:
+            callbacks_count = len(executor.callbacks)
 
         return {
-            "tools_count": len(executor.tools),
+            "tools_count": len(executor.tools) if executor.tools else 0,
             "tools": tools_info,
-            "max_iterations": executor.max_iterations,
-            "max_execution_time": executor.max_execution_time,
-            "verbose": executor.verbose,
-            "has_callbacks": len(executor.callbacks) > 0,
+            "max_iterations": getattr(executor, "max_iterations", "unknown"),
+            "max_execution_time": getattr(executor, "max_execution_time", "unknown"),
+            "verbose": getattr(executor, "verbose", False),
+            "has_callbacks": callbacks_count > 0,
+            "callbacks_count": callbacks_count,
         }
 
     except Exception as e:

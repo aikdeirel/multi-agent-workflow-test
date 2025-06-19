@@ -7,6 +7,9 @@ from langfuse import Langfuse
 
 logger = logging.getLogger(__name__)
 
+# Global variable to store current trace for tool access
+_current_trace = None
+
 
 def create_traced_tool(
     name: Optional[str] = None,
@@ -17,7 +20,7 @@ def create_traced_tool(
     Decorator for creating LangChain tools with seamless Langfuse integration.
 
     This decorator automatically:
-    - Creates Langfuse traces for tool execution
+    - Creates Langfuse spans for tool execution within the parent trace
     - Extracts tool names and descriptions from docstrings
     - Handles errors and logs them appropriately
     - Records execution metadata (timing, input/output sizes)
@@ -41,31 +44,48 @@ def create_traced_tool(
             # Start timing
             start_time = time.time()
 
-            # Prepare trace metadata
+            # Prepare input data
             input_data = {"args": args, "kwargs": kwargs}
 
-            trace_name = f"tool_{tool_name}"
-
             try:
-                # Create Langfuse trace if client is available
-                if langfuse_client:
-                    with langfuse_client.trace(
-                        name=trace_name,
-                        input=input_data,
-                        metadata={
-                            "tool_name": tool_name,
-                            "tool_description": tool_description,
-                            "function_name": func.__name__,
-                        },
-                    ) as trace:
-                        # Execute the function
-                        result = func(*args, **kwargs)
+                # Get parent trace from global variable
+                parent_trace = _current_trace
+                logger.debug(
+                    f"Tool {tool_name}: Found parent trace: {parent_trace is not None}"
+                )
 
-                        # Calculate execution time
-                        execution_time = time.time() - start_time
+                # Create tool span within parent trace if available
+                tool_span = None
+                if parent_trace:
+                    try:
+                        tool_span = parent_trace.span(
+                            name=f"tool_{tool_name}",
+                            input=input_data,
+                            metadata={
+                                "tool_name": tool_name,
+                                "tool_description": tool_description,
+                                "function_name": func.__name__,
+                                "tool_type": "operator",
+                            },
+                        )
+                        logger.info(f"✅ Created tool span for {tool_name}")
+                    except Exception as e:
+                        logger.error(
+                            f"❌ Failed to create tool span for {tool_name}: {e}"
+                        )
+                else:
+                    logger.warning(f"⚠️ No parent trace available for tool {tool_name}")
 
-                        # Add execution metadata
-                        trace.update(
+                # Execute the function
+                result = func(*args, **kwargs)
+
+                # Calculate execution time
+                execution_time = time.time() - start_time
+
+                # Update tool span with results
+                if tool_span:
+                    try:
+                        tool_span.update(
                             output=result,
                             metadata={
                                 "tool_name": tool_name,
@@ -75,22 +95,19 @@ def create_traced_tool(
                                 "input_size": len(str(input_data)),
                                 "output_size": len(str(result)) if result else 0,
                                 "success": True,
+                                "tool_type": "operator",
                             },
                         )
-
-                        logger.info(
-                            f"Tool '{tool_name}' executed successfully in {execution_time:.3f}s"
+                        logger.info(f"✅ Updated tool span for {tool_name}")
+                    except Exception as e:
+                        logger.error(
+                            f"❌ Failed to update tool span for {tool_name}: {e}"
                         )
-                        return result
-                else:
-                    # Execute without tracing if no client available
-                    logger.debug(f"Executing tool '{tool_name}' without tracing")
-                    result = func(*args, **kwargs)
-                    execution_time = time.time() - start_time
-                    logger.info(
-                        f"Tool '{tool_name}' executed successfully in {execution_time:.3f}s"
-                    )
-                    return result
+
+                logger.info(
+                    f"Tool '{tool_name}' executed successfully in {execution_time:.3f}s"
+                )
+                return result
 
             except Exception as e:
                 execution_time = time.time() - start_time
@@ -100,12 +117,10 @@ def create_traced_tool(
                     f"Tool '{tool_name}' failed after {execution_time:.3f}s: {error_msg}"
                 )
 
-                # Record error in trace if client available
-                if langfuse_client:
+                # Update tool span with error
+                if tool_span:
                     try:
-                        langfuse_client.trace(
-                            name=f"{trace_name}_error",
-                            input=input_data,
+                        tool_span.update(
                             output={"error": error_msg},
                             metadata={
                                 "tool_name": tool_name,
@@ -114,10 +129,13 @@ def create_traced_tool(
                                 "execution_time_seconds": execution_time,
                                 "success": False,
                                 "error_type": type(e).__name__,
+                                "tool_type": "operator",
                             },
                         )
                     except Exception as trace_error:
-                        logger.error(f"Failed to create error trace: {trace_error}")
+                        logger.error(
+                            f"Failed to update tool span with error: {trace_error}"
+                        )
 
                 # Re-raise the original exception
                 raise e

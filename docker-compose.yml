@@ -20,8 +20,6 @@ services:
     networks:
       - agent_network
 
-volumes:
-
 networks:
   agent_network:
     driver: bridge
