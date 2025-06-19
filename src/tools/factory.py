@@ -3,18 +3,15 @@ import functools
 import logging
 from typing import Callable, Any, Dict, Optional
 from langchain.tools import tool
-from langfuse import Langfuse
+from langfuse import get_client
 
 logger = logging.getLogger(__name__)
-
-# Global variable to store current trace for tool access
-_current_trace = None
 
 
 def create_traced_tool(
     name: Optional[str] = None,
     description: Optional[str] = None,
-    langfuse_client: Optional[Langfuse] = None,
+    langfuse_client=None,
 ):
     """
     Decorator for creating LangChain tools with seamless Langfuse integration.
@@ -48,43 +45,32 @@ def create_traced_tool(
             input_data = {"args": args, "kwargs": kwargs}
 
             try:
-                # Get parent trace from global variable
-                parent_trace = _current_trace
-                logger.debug(
-                    f"Tool {tool_name}: Found parent trace: {parent_trace is not None}"
-                )
+                # Use Langfuse 3.x context-aware approach
+                langfuse_client = get_client()
 
-                # Create tool span within parent trace if available
+                # Create tool span using Langfuse 3.x API
                 tool_span = None
-                if parent_trace:
-                    try:
-                        tool_span = parent_trace.span(
-                            name=f"tool_{tool_name}",
-                            input=input_data,
-                            metadata={
-                                "tool_name": tool_name,
-                                "tool_description": tool_description,
-                                "function_name": func.__name__,
-                                "tool_type": "operator",
-                            },
-                        )
+                try:
+                    # Create nested span for this tool execution
+                    with langfuse_client.start_as_current_span(
+                        name=f"tool_{tool_name}",
+                        input=input_data,
+                        metadata={
+                            "tool_name": tool_name,
+                            "tool_description": tool_description,
+                            "function_name": func.__name__,
+                            "tool_type": "operator",
+                        },
+                    ) as tool_span:
                         logger.info(f"✅ Created tool span for {tool_name}")
-                    except Exception as e:
-                        logger.error(
-                            f"❌ Failed to create tool span for {tool_name}: {e}"
-                        )
-                else:
-                    logger.warning(f"⚠️ No parent trace available for tool {tool_name}")
 
-                # Execute the function
-                result = func(*args, **kwargs)
+                        # Execute the function
+                        result = func(*args, **kwargs)
 
-                # Calculate execution time
-                execution_time = time.time() - start_time
+                        # Calculate execution time
+                        execution_time = time.time() - start_time
 
-                # Update tool span with results
-                if tool_span:
-                    try:
+                        # Update tool span with results
                         tool_span.update(
                             output=result,
                             metadata={
@@ -99,15 +85,23 @@ def create_traced_tool(
                             },
                         )
                         logger.info(f"✅ Updated tool span for {tool_name}")
-                    except Exception as e:
-                        logger.error(
-                            f"❌ Failed to update tool span for {tool_name}: {e}"
-                        )
 
-                logger.info(
-                    f"Tool '{tool_name}' executed successfully in {execution_time:.3f}s"
-                )
-                return result
+                        logger.info(
+                            f"Tool '{tool_name}' executed successfully in {execution_time:.3f}s"
+                        )
+                        return result
+
+                except Exception as e:
+                    # If tool span creation fails, execute without tracing
+                    logger.warning(
+                        f"⚠️ Failed to create tool span for {tool_name}, executing without tracing: {e}"
+                    )
+                    result = func(*args, **kwargs)
+                    execution_time = time.time() - start_time
+                    logger.info(
+                        f"Tool '{tool_name}' executed successfully in {execution_time:.3f}s (no tracing)"
+                    )
+                    return result
 
             except Exception as e:
                 execution_time = time.time() - start_time
@@ -117,27 +111,7 @@ def create_traced_tool(
                     f"Tool '{tool_name}' failed after {execution_time:.3f}s: {error_msg}"
                 )
 
-                # Update tool span with error
-                if tool_span:
-                    try:
-                        tool_span.update(
-                            output={"error": error_msg},
-                            metadata={
-                                "tool_name": tool_name,
-                                "tool_description": tool_description,
-                                "function_name": func.__name__,
-                                "execution_time_seconds": execution_time,
-                                "success": False,
-                                "error_type": type(e).__name__,
-                                "tool_type": "operator",
-                            },
-                        )
-                    except Exception as trace_error:
-                        logger.error(
-                            f"Failed to update tool span with error: {trace_error}"
-                        )
-
-                # Re-raise the original exception
+                # Re-raise the original exception (tracing errors are handled within the context manager)
                 raise e
 
         # Create the LangChain tool using the @tool decorator

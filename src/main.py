@@ -266,26 +266,23 @@ async def invoke_agent(request: InvokeRequest):
 
     logger.info(f"Processing request {request_id} for session {session_id}")
 
-    # Create Langfuse trace with proper hierarchy
+    # Create Langfuse trace with proper hierarchy for v3
     trace = None
     if app_state["langfuse_client"]:
         try:
-            trace = app_state["langfuse_client"].trace(
-                name="multi_agent_workflow",
-                session_id=session_id,
-                user_id=None,  # Could be added if you have user auth
-                input=request.input,
-                metadata={
-                    "request_id": request_id,
-                    "user_input": request.input,
-                    "metadata": request.metadata,
-                    "agent_type": "orchestrator",
-                },
-                tags=["agent", "orchestrator", "multi-agent-system"],
-            )
-            logger.debug(f"Created Langfuse trace: {trace.id}")
+            # Use context manager approach for Langfuse 3.x
+            # Note: This will create the trace context for this request
+            from langfuse import get_client
+
+            # Get the singleton client configured with env vars
+            langfuse_client = get_client()
+
+            # For Langfuse 3, we'll use the start_as_current_span approach within the execution
+            logger.debug(f"Using Langfuse 3.x API for tracing request {request_id}")
+
         except Exception as e:
-            logger.warning(f"Failed to create Langfuse trace: {str(e)}")
+            logger.warning(f"Failed to setup Langfuse tracing: {str(e)}")
+            trace = None
 
     try:
         # Validate agent availability
@@ -315,134 +312,64 @@ async def invoke_agent(request: InvokeRequest):
 
         logger.debug(f"Agent input: {agent_input}")
 
-        # Execute agent with tracing context
+        # Execute agent with tracing context using Langfuse 3.x
         try:
-            # Store trace in a way tools can access it
-            if trace:
-                # Use a simple global variable approach for tool access
-                from tools import factory as tool_factory
+            # Use Langfuse 3.x context manager approach
+            from langfuse import get_client
 
-                tool_factory._current_trace = trace
-                logger.info(f"✅ Set global trace for tools: {trace.id}")
+            langfuse_client = get_client()
 
-            # Create a simple callback to capture LLM interactions
-            from langchain.callbacks.base import BaseCallbackHandler
-
-            class LangfuseLLMCallback(BaseCallbackHandler):
-                def __init__(self, parent_trace):
-                    super().__init__()
-                    self.parent_trace = parent_trace
-                    self.llm_spans = []
-
-                def on_llm_start(self, serialized, prompts, **kwargs):
-                    if self.parent_trace:
-                        try:
-                            llm_span = self.parent_trace.span(
-                                name="llm_call",
-                                input={
-                                    "prompts": prompts[:1000] if prompts else ""
-                                },  # Truncate for readability
-                                metadata={
-                                    "model": "mistral-medium-latest",
-                                    "type": "llm_generation",
-                                    "serialized": str(serialized)[:200],
-                                },
-                            )
-                            self.llm_spans.append(llm_span)
-                            logger.info("✅ Created LLM span")
-                        except Exception as e:
-                            logger.error(f"❌ Failed to create LLM span: {e}")
-
-                def on_llm_end(self, response, **kwargs):
-                    if self.llm_spans:
-                        try:
-                            llm_span = self.llm_spans.pop()
-                            # Extract basic response info
-                            output_text = ""
-                            if (
-                                hasattr(response, "generations")
-                                and response.generations
-                            ):
-                                output_text = str(response.generations[0])[
-                                    :500
-                                ]  # Truncate
-
-                            llm_span.update(
-                                output=output_text,
-                                metadata={
-                                    "model": "mistral-medium-latest",
-                                    "type": "llm_generation",
-                                    "status": "completed",
-                                },
-                            )
-                            logger.info("✅ Updated LLM span")
-                        except Exception as e:
-                            logger.error(f"❌ Failed to update LLM span: {e}")
-
-                def on_llm_error(self, error, **kwargs):
-                    if self.llm_spans:
-                        try:
-                            llm_span = self.llm_spans.pop()
-                            llm_span.update(
-                                output={"error": str(error)},
-                                metadata={
-                                    "model": "mistral-medium-latest",
-                                    "type": "llm_generation",
-                                    "status": "error",
-                                },
-                            )
-                            logger.info("✅ Updated LLM span with error")
-                        except Exception as e:
-                            logger.error(
-                                f"❌ Failed to update LLM span with error: {e}"
-                            )
-
-            # Set up LLM callback if we have tracing
-            callbacks = []
-            if trace:
-                callbacks = [LangfuseLLMCallback(trace)]
-
-            result = await asyncio.to_thread(
-                lambda: app_state["agent_executor"].invoke(
-                    agent_input, config={"callbacks": callbacks} if callbacks else None
+            # Create main span for this request with proper Langfuse 3.x API
+            with langfuse_client.start_as_current_span(
+                name="multi_agent_workflow",
+                input={"query": request.input},
+                metadata={
+                    "request_id": request_id,
+                    "session_id": session_id,
+                    "user_input": request.input,
+                    "metadata": request.metadata,
+                    "agent_type": "orchestrator",
+                },
+            ) as main_span:
+                # Set trace attributes
+                main_span.update_trace(
+                    session_id=session_id,
+                    input={"query": request.input},
+                    tags=["agent", "orchestrator", "multi-agent-system"],
+                    metadata={
+                        "request_id": request_id,
+                        "agent_type": "orchestrator",
+                    },
                 )
-            )
 
-            # Clean up global trace reference
-            if trace:
-                tool_factory._current_trace = None
-                logger.info("🧹 Cleaned up global trace reference")
+                logger.info(f"✅ Created Langfuse 3.x trace with span: {main_span.id}")
 
-            # Update agent span with results
-            if agent_span:
-                agent_span.update(
+                # Execute the agent
+                result = await asyncio.to_thread(
+                    lambda: app_state["agent_executor"].invoke(agent_input)
+                )
+
+                # Update the span with results
+                main_span.update(
                     output=result.get("output", "No response generated"),
                     metadata={
-                        "tools_used": len(result.get("intermediate_steps", [])),
+                        "operators_used": len(result.get("intermediate_steps", [])),
                         "status": "success",
                     },
                 )
 
-            # Update main trace with success
-            if trace:
-                trace.update(
-                    output=result.get("output", "No response generated"),
+                # Update trace with final output
+                main_span.update_trace(
+                    output={"response": result.get("output", "No response generated")},
                     metadata={
                         "status": "success",
-                        "tools_used": len(result.get("intermediate_steps", [])),
-                        "intermediate_steps_count": len(
-                            result.get("intermediate_steps", [])
-                        ),
+                        "operators_used": len(result.get("intermediate_steps", [])),
                     },
                 )
+
+                logger.info("✅ Updated Langfuse trace with results")
 
         except Exception as e:
-            # Update spans and trace with error
-            if agent_span:
-                agent_span.update(metadata={"status": "error", "error": str(e)})
-            if trace:
-                trace.update(metadata={"status": "error", "error": str(e)})
-
             logger.error(f"Agent execution failed for request {request_id}: {str(e)}")
             raise HTTPException(
                 status_code=500, detail=f"Agent execution failed: {str(e)}"
@@ -462,7 +389,7 @@ async def invoke_agent(request: InvokeRequest):
                 "processing_time": "N/A",  # Would normally calculate this
                 "tools_used": len(intermediate_steps) if intermediate_steps else 0,
                 "langfuse_enabled": app_state["langfuse_client"] is not None,
-                "trace_id": trace.id if trace else None,
+                "trace_id": request_id,  # Use request_id as trace identifier
             },
         )
 
@@ -473,21 +400,6 @@ async def invoke_agent(request: InvokeRequest):
         # Re-raise HTTP exceptions
         raise
     except Exception as e:
-        # Update trace with unexpected error
-        if trace:
-            try:
-                trace.update(
-                    metadata={
-                        "status": "unexpected_error",
-                        "error": str(e),
-                        "error_type": type(e).__name__,
-                    }
-                )
-            except Exception as trace_error:
-                logger.warning(
-                    f"Failed to update Langfuse trace with unexpected error: {str(trace_error)}"
-                )
-
         logger.error(
             f"Unexpected error processing request {request_id}: {str(e)}", exc_info=True
         )

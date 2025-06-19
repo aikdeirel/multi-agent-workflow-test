@@ -11,7 +11,8 @@ from langchain.callbacks.base import BaseCallbackHandler
 
 from config import load_json_setting
 from prompt_manager import get_prompt_manager
-from tools.factory import validate_tool
+from operators.weather_operator_agent import weather_operator
+from operators.math_operator_agent import math_operator
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ class ProperLoggingCallback(BaseCallbackHandler):
     def on_tool_start(self, serialized, input_str, **kwargs):
         """Called when tool starts."""
         tool_name = serialized.get("name", "Unknown Tool")
-        self.logger.info(f"\033[1;33m⚡ Starting tool '{tool_name}'\033[0m")
+        self.logger.info(f"\033[1;33m⚡ Starting operator '{tool_name}'\033[0m")
 
     def on_tool_end(self, output, **kwargs):
         """Called when tool ends."""
@@ -46,7 +47,7 @@ class ProperLoggingCallback(BaseCallbackHandler):
 
     def on_tool_error(self, error, **kwargs):
         """Called when tool encounters an error."""
-        self.logger.error(f"\033[1;31m❌ Tool error:\033[0m {str(error)}")
+        self.logger.error(f"\033[1;31m❌ Operator error:\033[0m {str(error)}")
 
     def on_agent_finish(self, finish, **kwargs):
         """Called when agent finishes."""
@@ -80,68 +81,26 @@ class ProperLoggingCallback(BaseCallbackHandler):
         self.logger.debug("\033[1;90m💭 LLM response received\033[0m")
 
 
-def discover_and_load_tools(
-    operators_dir: str = "tools/operators", langfuse_client: Optional[Langfuse] = None
-) -> List[Any]:
+def get_operator_agents() -> List[Any]:
     """
-    Dynamically discover and load tools from the operators directory.
-
-    Args:
-        operators_dir: Directory containing operator modules
-        langfuse_client: Langfuse client for tool tracing
+    Get the available operator agent tools.
 
     Returns:
-        List of loaded and validated tools
+        List of operator agent tools
     """
-    tools = []
+    try:
+        # Return the operator agent tools
+        operators = [weather_operator, math_operator]
 
-    if not os.path.exists(operators_dir):
-        logger.warning(f"Operators directory '{operators_dir}' does not exist")
-        return tools
+        logger.info(f"Loaded {len(operators)} operator agents:")
+        for op in operators:
+            logger.info(f"  - {op.name}: {op.description[:100]}...")
 
-    # Find all Python files in operators directory
-    for filename in os.listdir(operators_dir):
-        if filename.endswith(".py") and filename != "__init__.py":
-            module_name = filename[:-3]  # Remove .py extension
-            module_path = os.path.join(operators_dir, filename)
+        return operators
 
-            try:
-                # Load module dynamically
-                spec = importlib.util.spec_from_file_location(module_name, module_path)
-                if spec is None or spec.loader is None:
-                    logger.error(f"Could not load spec for module {module_name}")
-                    continue
-
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-
-                # Look for tool functions in the module
-                # Convention: functions decorated with @create_traced_tool become tools
-                for attr_name in dir(module):
-                    attr = getattr(module, attr_name)
-
-                    # Check if it's a tool (has LangChain tool attributes)
-                    if (
-                        hasattr(attr, "name")
-                        and hasattr(attr, "description")
-                        and callable(attr)
-                    ):
-
-                        # Validate the tool
-                        if validate_tool(attr):
-                            tools.append(attr)
-                            logger.info(f"Loaded tool: {attr.name} from {module_name}")
-                        else:
-                            logger.error(
-                                f"Tool validation failed for {attr_name} in {module_name}"
-                            )
-
-            except Exception as e:
-                logger.error(f"Error loading operator module {module_name}: {str(e)}")
-                continue
-
-    logger.info(f"Successfully loaded {len(tools)} tools")
-    return tools
+    except Exception as e:
+        logger.error(f"Error loading operator agents: {str(e)}")
+        return []
 
 
 def create_llm_from_config() -> ChatMistralAI:
@@ -227,6 +186,15 @@ Observation: the result of the action
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
 
+CRITICAL SINGLE-ACTION RULES FOR ORCHESTRATOR:
+- YOU CAN ONLY PERFORM ONE DELEGATION AT A TIME
+- NEVER combine multiple Action/Action Input pairs in a single response
+- After generating Action and Action Input, STOP and wait for the Observation
+- Do NOT write multiple delegations like "Action: ... Action: ..." in the same response
+- Do NOT include placeholder text like "(After receiving...)" or "(Then I'll...)"
+- Each response must contain EITHER one Action OR one Final Answer, NEVER both
+- If you need multiple operators, delegate to them one at a time across multiple responses
+
 IMPORTANT RULES:
 - You must EITHER generate an Action OR a Final Answer, NEVER both in the same response
 - If you need to use a tool, generate Action and Action Input, then wait for Observation
@@ -285,11 +253,13 @@ def create_orchestrator_agent(
             except Exception as e:
                 logger.warning(f"Could not initialize Langfuse client: {str(e)}")
 
-        # Discover and load tools
-        tools = discover_and_load_tools(langfuse_client=langfuse_client)
+        # Get operator agents instead of individual tools
+        operators = get_operator_agents()
 
-        if not tools:
-            logger.warning("No tools loaded - agent will have limited functionality")
+        if not operators:
+            logger.warning(
+                "No operator agents loaded - agent will have limited functionality"
+            )
 
         # Create LLM (wrapped with @observe)
         llm = create_llm_from_config()
@@ -298,24 +268,22 @@ def create_orchestrator_agent(
         prompt = create_prompt_template()
 
         # Create ReAct agent (compatible with Mistral)
-        agent = create_react_agent(llm=llm, tools=tools, prompt=prompt)
+        agent = create_react_agent(llm=llm, tools=operators, prompt=prompt)
 
         # Create executor with basic configuration
         executor = AgentExecutor(
             agent=agent,
-            tools=tools,
+            tools=operators,
             verbose=False,  # Disable built-in verbose to use our custom callback
             max_iterations=10,
             max_execution_time=300,  # 5 minutes timeout
             return_intermediate_steps=True,
             handle_parsing_errors=True,
-            # Add early stopping to prevent infinite loops
-            early_stopping_method="generate",
             callbacks=[ProperLoggingCallback()],  # Add our custom callback
         )
 
         logger.info("Orchestrator agent created successfully")
-        logger.info(f"Agent configuration: {len(tools)} tools")
+        logger.info(f"Agent configuration: {len(operators)} operator agents")
 
         return executor
 
@@ -335,10 +303,10 @@ def get_agent_info(executor: AgentExecutor) -> dict:
         Dictionary containing agent information
     """
     try:
-        tools_info = []
+        operators_info = []
         if executor.tools:
             for tool in executor.tools:
-                tools_info.append(
+                operators_info.append(
                     {
                         "name": tool.name,
                         "description": (
@@ -355,8 +323,8 @@ def get_agent_info(executor: AgentExecutor) -> dict:
             callbacks_count = len(executor.callbacks)
 
         return {
-            "tools_count": len(executor.tools) if executor.tools else 0,
-            "tools": tools_info,
+            "operators_count": len(executor.tools) if executor.tools else 0,
+            "operators": operators_info,
             "max_iterations": getattr(executor, "max_iterations", "unknown"),
             "max_execution_time": getattr(executor, "max_execution_time", "unknown"),
             "verbose": getattr(executor, "verbose", False),
