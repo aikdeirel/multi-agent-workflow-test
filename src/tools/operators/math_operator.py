@@ -5,7 +5,6 @@ import logging
 from typing import Union, Dict, Any
 
 from langchain.tools import tool
-from langfuse.decorators import observe
 
 logger = logging.getLogger(__name__)
 
