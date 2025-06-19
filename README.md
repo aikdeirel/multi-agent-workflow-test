@@ -98,6 +98,22 @@ Here's a real example of how the system handles complex requests:
   - `math_help` - Mathematical guidance
 - **Features**: Supports arithmetic, functions, order of operations
 
+### Datetime Operator Agent
+- **Role**: Datetime specialist for handling date and time related tasks
+- **Tools**:
+  - `get_unix_time` - Get the current Unix timestamp or convert a date to Unix time
+  - `get_week_number` - Find the ISO week number for a given date
+  - `check_leap_year` - Check if a year is a leap year
+  - `validate_date` - Validate if a string is a valid date
+  - `get_weekday` - Find the weekday name for a specific date
+  - `calculate_progress` - Calculate progress of the year, month, or week
+  - `countdown_to_date` - Get the time remaining until a specific date
+  - `calculate_age` - Calculate age given a birth date
+  - `get_co2_level` - Get the current CO₂ level (experimental/time-based)
+  - `get_german_holidays` - List German public holidays for a given year
+  - `datetime_help` - Provides guidance on date and time queries
+- **Features**: Supports formatting, validation, time-based calculations, age and holiday lookup, and more
+
 ## Prerequisites
 
 - Docker and Docker Compose
