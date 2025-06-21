@@ -254,7 +254,7 @@ class TestCreateLlmFromConfig:
         with patch('config.get_global_settings', return_value=mock_settings), \
              patch('agent_factory.load_json_setting', return_value=invalid_config):
             
-            with pytest.raises(ValueError) as exc_info:
+            with pytest.raises(RuntimeError) as exc_info:
                 create_llm_from_config()
             
             assert "Missing required model configuration keys" in str(exc_info.value)

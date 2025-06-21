@@ -74,7 +74,8 @@ def mock_json_configs():
         base_name = filename.replace('.json', '')
         return configs.get(base_name, {})
     
-    with patch('config.load_json_setting', side_effect=mock_load_json_setting):
+    with patch('config.load_json_setting', side_effect=mock_load_json_setting), \
+         patch('agent_factory.load_json_setting', side_effect=mock_load_json_setting):
         yield configs
 
 
