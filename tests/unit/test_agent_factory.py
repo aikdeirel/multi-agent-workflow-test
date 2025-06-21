@@ -217,7 +217,7 @@ class TestCreateLlmFromConfig:
     @pytest.mark.unit
     def test_create_llm_success(self, mock_env_vars, mock_json_configs, mock_settings):
         """Test successful LLM creation."""
-        with patch('agent_factory.get_global_settings', return_value=mock_settings), \
+        with patch('config.get_global_settings', return_value=mock_settings), \
              patch('agent_factory.ChatMistralAI') as mock_mistral:
             
             mock_llm = Mock()
@@ -238,7 +238,7 @@ class TestCreateLlmFromConfig:
     @pytest.mark.unit
     def test_create_llm_missing_config(self, mock_env_vars, mock_settings):
         """Test LLM creation with missing model config."""
-        with patch('agent_factory.get_global_settings', return_value=mock_settings), \
+        with patch('config.get_global_settings', return_value=mock_settings), \
              patch('agent_factory.load_json_setting', side_effect=FileNotFoundError("Config not found")):
             
             with pytest.raises(RuntimeError) as exc_info:
@@ -251,7 +251,7 @@ class TestCreateLlmFromConfig:
         """Test LLM creation with invalid model config."""
         invalid_config = {"temperature": 0.7}  # Missing required keys
         
-        with patch('agent_factory.get_global_settings', return_value=mock_settings), \
+        with patch('config.get_global_settings', return_value=mock_settings), \
              patch('agent_factory.load_json_setting', return_value=invalid_config):
             
             with pytest.raises(ValueError) as exc_info:
@@ -262,7 +262,7 @@ class TestCreateLlmFromConfig:
     @pytest.mark.unit
     def test_create_llm_mistral_error(self, mock_env_vars, mock_json_configs, mock_settings):
         """Test LLM creation with ChatMistralAI error."""
-        with patch('agent_factory.get_global_settings', return_value=mock_settings), \
+        with patch('config.get_global_settings', return_value=mock_settings), \
              patch('agent_factory.ChatMistralAI', side_effect=Exception("Mistral error")):
             
             with pytest.raises(RuntimeError) as exc_info:
@@ -575,7 +575,8 @@ class TestGetAgentInfo:
     def test_get_agent_info_error(self):
         """Test agent info with error."""
         mock_executor = Mock()
-        mock_executor.tools = Mock(side_effect=Exception("Tools error"))
+        # Configure tools property to raise an exception when accessed
+        type(mock_executor).tools = Mock(side_effect=Exception("Tools error"))
         
         result = get_agent_info(mock_executor)
         
@@ -700,6 +701,10 @@ class TestAgentFactoryEdgeCases:
         """Test get_agent_info when tools is None."""
         mock_executor = Mock()
         mock_executor.tools = None
+        mock_executor.max_iterations = 10
+        mock_executor.max_execution_time = 300
+        mock_executor.verbose = False
+        mock_executor.callbacks = None
         
         result = get_agent_info(mock_executor)
         

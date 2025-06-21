@@ -129,11 +129,22 @@ Use these tools to handle date and time operations."""
 @pytest.fixture
 def mock_langfuse_client():
     """Mock Langfuse client for testing."""
-    mock_client = Mock(spec=Langfuse)
+    mock_client = Mock()
     mock_client.flush.return_value = None
-    mock_client.trace.return_value = Mock()
-    mock_client.start_as_current_span.return_value.__enter__ = Mock()
-    mock_client.start_as_current_span.return_value.__exit__ = Mock()
+    
+    # Configure trace method and context manager
+    mock_trace = Mock()
+    mock_trace.__enter__ = Mock(return_value=mock_trace)
+    mock_trace.__exit__ = Mock(return_value=None)
+    mock_trace.id = "test-trace-id"
+    mock_client.trace.return_value = mock_trace
+    
+    # Configure start_as_current_span method
+    mock_span = Mock()
+    mock_span.__enter__ = Mock(return_value=mock_span)
+    mock_span.__exit__ = Mock(return_value=None)
+    mock_span.id = "test-span-id"
+    mock_client.start_as_current_span.return_value = mock_span
     
     with patch('langfuse.Langfuse', return_value=mock_client), \
          patch('langfuse.get_client', return_value=mock_client):
