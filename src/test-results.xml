@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="6" failures="46" skipped="0" tests="190" time="3.669" timestamp="2025-06-21T10:44:17.341865+00:00" hostname="cursor"><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_callback_initialization" time="0.031" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_chain_start" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_agent_action" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_tool_start" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_tool_end" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_tool_error" time="0.002" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_agent_finish" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_chain_end" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_text_thought_processing" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_llm_start" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestProperLoggingCallback" name="test_on_llm_end" time="0.002" /><testcase classname="tests.unit.test_agent_factory.TestGetOperatorAgents" name="test_get_operator_agents_success" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestGetOperatorAgents" name="test_get_operator_agents_with_error" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestCreateLlmFromConfig" name="test_create_llm_success" time="0.004"><failure message="AttributeError: &lt;module 'agent_factory' from '/workspace/tests/../src/agent_factory.py'&gt; does not have the attribute 'get_global_settings'">../tests/unit/test_agent_factory.py:220: in test_create_llm_success
+    with patch('agent_factory.get_global_settings', return_value=mock_settings), \
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:1497: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:1467: in get_original
+    raise AttributeError(
+E   AttributeError: &lt;module 'agent_factory' from '/workspace/tests/../src/agent_factory.py'&gt; does not have the attribute 'get_global_settings'</failure></testcase><testcase classname="tests.unit.test_agent_factory.TestCreateLlmFromConfig" name="test_create_llm_missing_config" time="0.003"><failure message="AttributeError: &lt;module 'agent_factory' from '/workspace/tests/../src/agent_factory.py'&gt; does not have the attribute 'get_global_settings'">../tests/unit/test_agent_factory.py:241: in test_create_llm_missing_config
+    with patch('agent_factory.get_global_settings', return_value=mock_settings), \
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:1497: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:1467: in get_original
+    raise AttributeError(
+E   AttributeError: &lt;module 'agent_factory' from '/workspace/tests/../src/agent_factory.py'&gt; does not have the attribute 'get_global_settings'</failure></testcase><testcase classname="tests.unit.test_agent_factory.TestCreateLlmFromConfig" name="test_create_llm_invalid_config" time="0.003"><failure message="AttributeError: &lt;module 'agent_factory' from '/workspace/tests/../src/agent_factory.py'&gt; does not have the attribute 'get_global_settings'">../tests/unit/test_agent_factory.py:254: in test_create_llm_invalid_config
+    with patch('agent_factory.get_global_settings', return_value=mock_settings), \
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:1497: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:1467: in get_original
+    raise AttributeError(
+E   AttributeError: &lt;module 'agent_factory' from '/workspace/tests/../src/agent_factory.py'&gt; does not have the attribute 'get_global_settings'</failure></testcase><testcase classname="tests.unit.test_agent_factory.TestCreateLlmFromConfig" name="test_create_llm_mistral_error" time="0.003"><failure message="AttributeError: &lt;module 'agent_factory' from '/workspace/tests/../src/agent_factory.py'&gt; does not have the attribute 'get_global_settings'">../tests/unit/test_agent_factory.py:265: in test_create_llm_mistral_error
+    with patch('agent_factory.get_global_settings', return_value=mock_settings), \
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:1497: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:1467: in get_original
+    raise AttributeError(
+E   AttributeError: &lt;module 'agent_factory' from '/workspace/tests/../src/agent_factory.py'&gt; does not have the attribute 'get_global_settings'</failure></testcase><testcase classname="tests.unit.test_agent_factory.TestCreatePromptTemplate" name="test_create_prompt_template_success" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestCreatePromptTemplate" name="test_create_prompt_template_custom_name" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestCreatePromptTemplate" name="test_create_prompt_template_error" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestCreatePromptTemplate" name="test_prompt_template_content" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestCreateOrchestratorAgent" name="test_create_orchestrator_agent_success" time="0.003"><error message="failed on setup with &quot;AttributeError: Mock object has no attribute 'trace'&quot;">../tests/conftest.py:134: in mock_langfuse_client
+    mock_client.trace.return_value = Mock()
+    ^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:690: in __getattr__
+    raise AttributeError("Mock object has no attribute %r" % name)
+E   AttributeError: Mock object has no attribute 'trace'</error></testcase><testcase classname="tests.unit.test_agent_factory.TestCreateOrchestratorAgent" name="test_create_orchestrator_agent_no_operators" time="0.004"><error message="failed on setup with &quot;AttributeError: Mock object has no attribute 'trace'&quot;">../tests/conftest.py:134: in mock_langfuse_client
+    mock_client.trace.return_value = Mock()
+    ^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:690: in __getattr__
+    raise AttributeError("Mock object has no attribute %r" % name)
+E   AttributeError: Mock object has no attribute 'trace'</error></testcase><testcase classname="tests.unit.test_agent_factory.TestCreateOrchestratorAgent" name="test_create_orchestrator_agent_without_langfuse" time="0.004" /><testcase classname="tests.unit.test_agent_factory.TestCreateOrchestratorAgent" name="test_create_orchestrator_agent_error" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestCreateOrchestratorAgent" name="test_agent_executor_configuration" time="0.002"><error message="failed on setup with &quot;AttributeError: Mock object has no attribute 'trace'&quot;">../tests/conftest.py:134: in mock_langfuse_client
+    mock_client.trace.return_value = Mock()
+    ^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:690: in __getattr__
+    raise AttributeError("Mock object has no attribute %r" % name)
+E   AttributeError: Mock object has no attribute 'trace'</error></testcase><testcase classname="tests.unit.test_agent_factory.TestGetAgentInfo" name="test_get_agent_info_success" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestGetAgentInfo" name="test_get_agent_info_no_tools" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestGetAgentInfo" name="test_get_agent_info_long_descriptions" time="0.003" /><testcase classname="tests.unit.test_agent_factory.TestGetAgentInfo" name="test_get_agent_info_error" time="0.002"><failure message="assert 'Tools error' in &quot;'Mock' object is not iterable&quot;">../tests/unit/test_agent_factory.py:583: in test_get_agent_info_error
+    assert "Tools error" in result["error"]
+E   assert 'Tools error' in "'Mock' object is not iterable"</failure></testcase><testcase classname="tests.unit.test_agent_factory.TestGetAgentInfo" name="test_get_agent_info_missing_attributes" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestAgentFactoryIntegration" name="test_complete_agent_creation_workflow" time="0.002"><error message="failed on setup with &quot;AttributeError: Mock object has no attribute 'trace'&quot;">../tests/conftest.py:134: in mock_langfuse_client
+    mock_client.trace.return_value = Mock()
+    ^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:690: in __getattr__
+    raise AttributeError("Mock object has no attribute %r" % name)
+E   AttributeError: Mock object has no attribute 'trace'</error></testcase><testcase classname="tests.unit.test_agent_factory.TestAgentFactoryIntegration" name="test_error_handling_throughout_workflow" time="0.004" /><testcase classname="tests.unit.test_agent_factory.TestAgentFactoryEdgeCases" name="test_callback_with_empty_text" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestAgentFactoryEdgeCases" name="test_callback_with_special_characters" time="0.001" /><testcase classname="tests.unit.test_agent_factory.TestAgentFactoryEdgeCases" name="test_agent_info_with_none_tools" time="0.004"><failure message="KeyError: 'operators_count'">../tests/unit/test_agent_factory.py:706: in test_agent_info_with_none_tools
+    assert result["operators_count"] == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'operators_count'</failure></testcase><testcase classname="tests.unit.test_agent_factory.TestAgentFactoryEdgeCases" name="test_large_number_of_operators" time="0.002"><error message="failed on setup with &quot;AttributeError: Mock object has no attribute 'trace'&quot;">../tests/conftest.py:134: in mock_langfuse_client
+    mock_client.trace.return_value = Mock()
+    ^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:690: in __getattr__
+    raise AttributeError("Mock object has no attribute %r" % name)
+E   AttributeError: Mock object has no attribute 'trace'</error></testcase><testcase classname="tests.unit.test_config.TestSettings" name="test_settings_with_valid_env_vars" time="0.002" /><testcase classname="tests.unit.test_config.TestSettings" name="test_settings_default_values" time="0.002" /><testcase classname="tests.unit.test_config.TestSettings" name="test_settings_missing_required_field" time="0.001" /><testcase classname="tests.unit.test_config.TestSettings" name="test_settings_case_insensitive" time="0.001" /><testcase classname="tests.unit.test_config.TestLoadJsonSetting" name="test_load_valid_json_file" time="0.002" /><testcase classname="tests.unit.test_config.TestLoadJsonSetting" name="test_load_json_file_without_extension" time="0.001" /><testcase classname="tests.unit.test_config.TestLoadJsonSetting" name="test_load_json_file_with_extension" time="0.001" /><testcase classname="tests.unit.test_config.TestLoadJsonSetting" name="test_load_nonexistent_file" time="0.001" /><testcase classname="tests.unit.test_config.TestLoadJsonSetting" name="test_load_invalid_json" time="0.001" /><testcase classname="tests.unit.test_config.TestLoadJsonSetting" name="test_load_empty_json_file" time="0.001"><failure message="AssertionError: assert 'Configuration file is empty' in 'Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)'&#10; +  where 'Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)' = str(JSONDecodeError('Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)'))&#10; +    where JSONDecodeError('Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)') = &lt;ExceptionInfo JSONDecodeError('Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)') tblen=2&gt;.value">../tests/unit/test_config.py:136: in test_load_empty_json_file
+    assert "Configuration file is empty" in str(exc_info.value)
+E   AssertionError: assert 'Configuration file is empty' in 'Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)'
+E    +  where 'Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)' = str(JSONDecodeError('Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)'))
+E    +    where JSONDecodeError('Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)') = &lt;ExceptionInfo JSONDecodeError('Invalid JSON in /tmp/tmpzmpty61u/empty.json: Expecting value: line 1 column 1 (char 0)') tblen=2&gt;.value</failure></testcase><testcase classname="tests.unit.test_config.TestLoadJsonSetting" name="test_load_json_with_empty_dict" time="0.001" /><testcase classname="tests.unit.test_config.TestLoadJsonSetting" name="test_load_json_permission_error" time="0.001" /><testcase classname="tests.unit.test_config.TestGetSettings" name="test_get_settings_success" time="0.002" /><testcase classname="tests.unit.test_config.TestGetSettings" name="test_get_settings_validation_error" time="0.001" /><testcase classname="tests.unit.test_config.TestValidateRequiredSettings" name="test_validate_all_required_fields_present" time="0.002" /><testcase classname="tests.unit.test_config.TestValidateRequiredSettings" name="test_validate_missing_langfuse_public_key" time="0.002" /><testcase classname="tests.unit.test_config.TestValidateRequiredSettings" name="test_validate_missing_langfuse_secret_key" time="0.002" /><testcase classname="tests.unit.test_config.TestValidateRequiredSettings" name="test_validate_missing_mistral_api_key" time="0.002" /><testcase classname="tests.unit.test_config.TestValidateRequiredSettings" name="test_validate_multiple_missing_fields" time="0.002" /><testcase classname="tests.unit.test_config.TestGetGlobalSettings" name="test_get_global_settings_first_call" time="0.002" /><testcase classname="tests.unit.test_config.TestGetGlobalSettings" name="test_get_global_settings_subsequent_calls" time="0.002" /><testcase classname="tests.unit.test_config.TestGetGlobalSettings" name="test_get_global_settings_validation_error" time="0.002"><failure message="AssertionError: assert 'Missing required configuration fields' in 'Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nlangfuse_secret_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nmistral_api_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing'&#10; +  where 'Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nlangfuse_secret_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nmistral_api_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing' = str(ValueError('Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nlangfuse_secret_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nmistral_api_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing'))&#10; +    where ValueError('Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nlangfuse_secret_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nmistral_api_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing') = &lt;ExceptionInfo ValueError('Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [...ssing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing') tblen=3&gt;.value">../tests/unit/test_config.py:279: in test_get_global_settings_validation_error
+    assert "Missing required configuration fields" in str(exc_info.value)
+E   AssertionError: assert 'Missing required configuration fields' in 'Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nlangfuse_secret_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nmistral_api_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing'
+E    +  where 'Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nlangfuse_secret_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nmistral_api_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing' = str(ValueError('Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nlangfuse_secret_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nmistral_api_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing'))
+E    +    where ValueError('Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nlangfuse_secret_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nmistral_api_key\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing') = &lt;ExceptionInfo ValueError('Configuration validation failed: 3 validation errors for Settings\nlangfuse_public_key\n  Field required [...ssing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing') tblen=3&gt;.value</failure></testcase><testcase classname="tests.unit.test_config.TestSettingsIntegration" name="test_complete_settings_workflow" time="0.002" /><testcase classname="tests.unit.test_config.TestSettingsIntegration" name="test_settings_environment_override" time="0.001" /><testcase classname="tests.unit.test_config.TestConfigEdgeCases" name="test_load_json_with_unicode_content" time="0.001" /><testcase classname="tests.unit.test_config.TestConfigEdgeCases" name="test_load_json_large_file" time="0.003" /><testcase classname="tests.unit.test_config.TestConfigEdgeCases" name="test_settings_with_special_characters" time="0.001" /><testcase classname="tests.unit.test_main.TestHealthEndpoint" name="test_health_check_success" time="0.020" /><testcase classname="tests.unit.test_main.TestHealthEndpoint" name="test_health_check_agent_not_initialized" time="0.007" /><testcase classname="tests.unit.test_main.TestHealthEndpoint" name="test_health_check_with_agent_info_error" time="0.007" /><testcase classname="tests.unit.test_main.TestAgentInfoEndpoint" name="test_get_agent_info_success" time="0.003" /><testcase classname="tests.unit.test_main.TestAgentInfoEndpoint" name="test_get_agent_info_agent_not_initialized" time="0.007"><failure message="assert 500 == 503&#10; +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code">../tests/unit/test_main.py:106: in test_get_agent_info_agent_not_initialized
+    assert response.status_code == 503
+E   assert 500 == 503
+E    +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code</failure></testcase><testcase classname="tests.unit.test_main.TestAgentInfoEndpoint" name="test_get_agent_info_error" time="0.007" /><testcase classname="tests.unit.test_main.TestInvokeEndpoint" name="test_invoke_agent_success" time="0.008" /><testcase classname="tests.unit.test_main.TestInvokeEndpoint" name="test_invoke_agent_without_session_id" time="0.006" /><testcase classname="tests.unit.test_main.TestInvokeEndpoint" name="test_invoke_agent_with_metadata" time="0.006"><failure message="AssertionError: Expected 'invoke' to have been called once. Called 0 times.">/usr/lib/python3.13/unittest/mock.py:958: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'invoke' to have been called once. Called 0 times.
+
+During handling of the above exception, another exception occurred:
+../tests/unit/test_main.py:249: in test_invoke_agent_with_metadata
+    mock_agent.invoke.assert_called_once()
+E   AssertionError: Expected 'invoke' to have been called once. Called 0 times.</failure></testcase><testcase classname="tests.unit.test_main.TestInvokeEndpoint" name="test_invoke_agent_not_initialized" time="0.005" /><testcase classname="tests.unit.test_main.TestInvokeEndpoint" name="test_invoke_agent_execution_error" time="0.005" /><testcase classname="tests.unit.test_main.TestInvokeEndpoint" name="test_invoke_agent_without_langfuse" time="0.005"><failure message="assert 500 == 200&#10; +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code">../tests/unit/test_main.py:328: in test_invoke_agent_without_langfuse
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code</failure></testcase><testcase classname="tests.unit.test_main.TestInvokeRequestValidation" name="test_invoke_empty_input" time="0.007" /><testcase classname="tests.unit.test_main.TestInvokeRequestValidation" name="test_invoke_missing_input" time="0.003" /><testcase classname="tests.unit.test_main.TestInvokeRequestValidation" name="test_invoke_invalid_json" time="0.003" /><testcase classname="tests.unit.test_main.TestInvokeRequestValidation" name="test_invoke_wrong_content_type" time="0.003" /><testcase classname="tests.unit.test_main.TestErrorHandling" name="test_global_exception_handler" time="0.009"><failure message="ValueError: Test error">../tests/unit/test_main.py:403: in test_global_exception_handler
+    response = test_client.get("/test-error")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/starlette/testclient.py:465: in get
+    return super().get(
+venv/lib/python3.13/site-packages/httpx/_client.py:1053: in get
+    return self.request(
+venv/lib/python3.13/site-packages/starlette/testclient.py:437: in request
+    return super().request(
+venv/lib/python3.13/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+venv/lib/python3.13/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+venv/lib/python3.13/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/starlette/testclient.py:340: in handle_request
+    raise exc
+venv/lib/python3.13/site-packages/starlette/testclient.py:337: in handle_request
+    portal.call(self.app, scope, receive, send)
+venv/lib/python3.13/site-packages/anyio/from_thread.py:290: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+venv/lib/python3.13/site-packages/anyio/from_thread.py:221: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+venv/lib/python3.13/site-packages/starlette/applications.py:112: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.13/site-packages/starlette/middleware/errors.py:187: in __call__
+    raise exc
+venv/lib/python3.13/site-packages/starlette/middleware/errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv/lib/python3.13/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.13/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.13/site-packages/starlette/routing.py:714: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.13/site-packages/starlette/routing.py:734: in app
+    await route.handle(scope, receive, send)
+venv/lib/python3.13/site-packages/starlette/routing.py:288: in handle
+    await self.app(scope, receive, send)
+venv/lib/python3.13/site-packages/starlette/routing.py:76: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv/lib/python3.13/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.13/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.13/site-packages/starlette/routing.py:73: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/fastapi/routing.py:301: in app
+    raw_response = await run_endpoint_function(
+venv/lib/python3.13/site-packages/fastapi/routing.py:214: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/starlette/concurrency.py:37: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:2470: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:967: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+../tests/unit/test_main.py:401: in test_error
+    raise ValueError("Test error")
+E   ValueError: Test error</failure></testcase><testcase classname="tests.unit.test_main.TestErrorHandling" name="test_http_exception_handling" time="0.006"><failure message="AttributeError: property 'routes' of 'FastAPI' object has no setter">../tests/unit/test_main.py:430: in test_http_exception_handling
+    app.routes = [route for route in app.routes if not (
+    ^^^^^^^^^^
+E   AttributeError: property 'routes' of 'FastAPI' object has no setter</failure></testcase><testcase classname="tests.unit.test_main.TestResponseModels" name="test_invoke_response_structure" time="0.006" /><testcase classname="tests.unit.test_main.TestApplicationLifecycle" name="test_application_startup_configuration" time="0.000" /><testcase classname="tests.unit.test_main.TestApplicationLifecycle" name="test_lifespan_startup_success" time="0.002"><error message="failed on setup with &quot;AttributeError: Mock object has no attribute 'trace'&quot;">../tests/conftest.py:134: in mock_langfuse_client
+    mock_client.trace.return_value = Mock()
+    ^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/unittest/mock.py:690: in __getattr__
+    raise AttributeError("Mock object has no attribute %r" % name)
+E   AttributeError: Mock object has no attribute 'trace'</error></testcase><testcase classname="tests.unit.test_main.TestApplicationLifecycle" name="test_lifespan_startup_failure" time="0.001" /><testcase classname="tests.unit.test_main.TestIntegration" name="test_complete_api_workflow" time="0.012" /><testcase classname="tests.unit.test_main.TestAPIDocumentation" name="test_openapi_spec_available" time="0.010" /><testcase classname="tests.unit.test_main.TestAPIDocumentation" name="test_docs_endpoint_available" time="0.004" /><testcase classname="tests.unit.test_main.TestSecurityAndValidation" name="test_invoke_request_size_limit" time="0.011" /><testcase classname="tests.unit.test_main.TestSecurityAndValidation" name="test_concurrent_requests" time="0.026" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_init_with_default_directory" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_init_with_custom_directory" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_init_with_nonexistent_directory" time="0.002"><failure message="AssertionError: Expected 'warning' to have been called.">/usr/lib/python3.13/unittest/mock.py:948: in assert_called
+    raise AssertionError(msg)
+E   AssertionError: Expected 'warning' to have been called.
+
+During handling of the above exception, another exception occurred:
+../tests/unit/test_prompt_manager.py:39: in test_init_with_nonexistent_directory
+    mock_logger.return_value.warning.assert_called()
+E   AssertionError: Expected 'warning' to have been called.</failure></testcase><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_success" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_with_md_extension" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_without_md_extension" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_nonexistent_file" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_file_read_error" time="0.002" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_empty_file" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_whitespace_only_file" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_with_unicode_content" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_get_prompt_strips_whitespace" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_list_available_prompts_success" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_list_available_prompts_empty_directory" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_list_available_prompts_nonexistent_directory" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_list_available_prompts_mixed_files" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManager" name="test_list_available_prompts_permission_error" time="0.002" /><testcase classname="tests.unit.test_prompt_manager.TestGetPromptManager" name="test_get_prompt_manager_default" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestGetPromptManager" name="test_get_prompt_manager_custom_directory" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestGetPromptManager" name="test_get_prompt_manager_singleton" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerIntegration" name="test_complete_prompt_workflow" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerIntegration" name="test_prompt_manager_with_real_files" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerEdgeCases" name="test_get_prompt_very_long_filename" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerEdgeCases" name="test_get_prompt_with_path_traversal" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerEdgeCases" name="test_get_prompt_with_special_characters" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerEdgeCases" name="test_prompt_manager_large_file" time="0.001" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerEdgeCases" name="test_prompt_manager_concurrent_access" time="0.003" /><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerLogging" name="test_logging_on_successful_load" time="0.002"><failure message="AssertionError: expected call not found.&#10;Expected: debug('Loaded prompt: main_orchestrator_system.md')&#10;  Actual: not called.">/usr/lib/python3.13/unittest/mock.py:970: in assert_called_with
+    raise AssertionError(error_message)
+E   AssertionError: expected call not found.
+E   Expected: debug('Loaded prompt: main_orchestrator_system.md')
+E     Actual: not called.
+
+During handling of the above exception, another exception occurred:
+../tests/unit/test_prompt_manager.py:432: in test_logging_on_successful_load
+    mock_logger.debug.assert_called_with("Loaded prompt: main_orchestrator_system.md")
+E   AssertionError: expected call not found.
+E   Expected: debug('Loaded prompt: main_orchestrator_system.md')
+E     Actual: not called.</failure></testcase><testcase classname="tests.unit.test_prompt_manager.TestPromptManagerLogging" name="test_logging_on_error" time="0.003"><failure message="AssertionError: Expected 'error' to have been called.">/usr/lib/python3.13/unittest/mock.py:948: in assert_called
+    raise AssertionError(msg)
+E   AssertionError: Expected 'error' to have been called.
+
+During handling of the above exception, another exception occurred:
+../tests/unit/test_prompt_manager.py:450: in test_logging_on_error
+    mock_logger.error.assert_called()
+E   AssertionError: Expected 'error' to have been called.</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_success" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_with_country" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_not_found" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_empty_results" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_network_error" time="0.002" /><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_timeout" time="0.002" /><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_invalid_json_response" time="0.002" /><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_empty_location" time="0.392" /><testcase classname="tests.unit.test_weather_tools.TestGeocodeLocation" name="test_geocode_parameters" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestFormatWeatherResponse" name="test_format_current_weather_complete" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestFormatWeatherResponse" name="test_format_weather_with_daily_forecast" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestFormatWeatherResponse" name="test_format_weather_minimal_data" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestFormatWeatherResponse" name="test_format_weather_no_country" time="0.000" /><testcase classname="tests.unit.test_weather_tools.TestFormatWeatherResponse" name="test_format_weather_error_handling" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[0-Clear sky]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[1-Mainly clear]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[2-Partly cloudy]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[3-Overcast]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[45-Fog]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[61-Slight rain]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[71-Slight snow fall]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[95-Thunderstorm]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_valid_weather_codes[99-Thunderstorm with heavy hail]" time="0.001" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_invalid_weather_code" time="0.000" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherDescription" name="test_negative_weather_code" time="0.000" /><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_city_name" time="0.004" /><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_coordinates" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_with_forecast" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'include_forecast'">../tests/unit/test_weather_tools.py:286: in test_get_current_weather_with_forecast
+    result = get_current_weather("Berlin", include_forecast=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'include_forecast'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_invalid_coordinates" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_location_not_found" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_network_error" time="0.003"><failure message="assert 'Network error' in &quot;Error: Could not find coordinates for location 'Berlin'. Please check the spelling or try a different location.&quot;">../tests/unit/test_weather_tools.py:322: in test_get_current_weather_network_error
+    assert "Network error" in result
+E   assert 'Network error' in "Error: Could not find coordinates for location 'Berlin'. Please check the spelling or try a different location."</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_empty_location" time="0.002" /><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_json_input" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestGetCurrentWeather" name="test_get_current_weather_malformed_json_input" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherForecast" name="test_get_weather_forecast_default_days" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestGetWeatherForecast" name="test_get_weather_forecast_custom_days" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:366: in test_get_weather_forecast_custom_days
+    result = get_weather_forecast("Berlin", days=5)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestGetWeatherForecast" name="test_get_weather_forecast_coordinates" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:374: in test_get_weather_forecast_coordinates
+    result = get_weather_forecast("52.52,13.41", days=3)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestGetWeatherForecast" name="test_get_weather_forecast_invalid_days" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:383: in test_get_weather_forecast_invalid_days
+    result = get_weather_forecast("Berlin", days=20)  # Too many days
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestGetWeatherForecast" name="test_get_weather_forecast_zero_days" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:391: in test_get_weather_forecast_zero_days
+    result = get_weather_forecast("Berlin", days=0)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestGetWeatherForecast" name="test_get_weather_forecast_negative_days" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:399: in test_get_weather_forecast_negative_days
+    result = get_weather_forecast("Berlin", days=-1)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestGetWeatherForecast" name="test_get_weather_forecast_non_integer_days" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:407: in test_get_weather_forecast_non_integer_days
+    result = get_weather_forecast("Berlin", days="five")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherHelp" name="test_weather_help_content" time="0.001"><failure message="TypeError: BaseTool.__call__() missing 1 required positional argument: 'tool_input'">../tests/unit/test_weather_tools.py:419: in test_weather_help_content
+    result = weather_help()
+             ^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() missing 1 required positional argument: 'tool_input'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherHelp" name="test_weather_help_function_descriptions" time="0.001"><failure message="TypeError: BaseTool.__call__() missing 1 required positional argument: 'tool_input'">../tests/unit/test_weather_tools.py:435: in test_weather_help_function_descriptions
+    result = weather_help()
+             ^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() missing 1 required positional argument: 'tool_input'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherHelp" name="test_weather_help_location_formats" time="0.001"><failure message="TypeError: BaseTool.__call__() missing 1 required positional argument: 'tool_input'">../tests/unit/test_weather_tools.py:444: in test_weather_help_location_formats
+    result = weather_help()
+             ^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() missing 1 required positional argument: 'tool_input'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherHelp" name="test_weather_help_examples" time="0.001"><failure message="TypeError: BaseTool.__call__() missing 1 required positional argument: 'tool_input'">../tests/unit/test_weather_tools.py:453: in test_weather_help_examples
+    result = weather_help()
+             ^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() missing 1 required positional argument: 'tool_input'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsIntegration" name="test_complete_weather_workflow" time="0.004"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:474: in test_complete_weather_workflow
+    forecast_result = get_weather_forecast(location, days=3)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsIntegration" name="test_weather_tools_error_handling" time="0.004"><failure message="assert 'Network error' in &quot;Error: Could not find coordinates for location 'Berlin'. Please check the spelling or try a different location.&quot;">../tests/unit/test_weather_tools.py:492: in test_weather_tools_error_handling
+    assert "Network error" in current_result
+E   assert 'Network error' in "Error: Could not find coordinates for location 'Berlin'. Please check the spelling or try a different location."</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_current_weather_various_locations[Berlin]" time="0.004" /><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_current_weather_various_locations[London, UK]" time="0.003"><failure message="assert 'Temperature:' in &quot;Error: Invalid coordinate format. Use 'latitude,longitude' (e.g., '52.52,13.41')&quot;">../tests/unit/test_weather_tools.py:511: in test_get_current_weather_various_locations
+    assert "Temperature:" in result
+E   assert 'Temperature:' in "Error: Invalid coordinate format. Use 'latitude,longitude' (e.g., '52.52,13.41')"</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_current_weather_various_locations[New York, USA]" time="0.003"><failure message="assert 'Temperature:' in &quot;Error: Invalid coordinate format. Use 'latitude,longitude' (e.g., '52.52,13.41')&quot;">../tests/unit/test_weather_tools.py:511: in test_get_current_weather_various_locations
+    assert "Temperature:" in result
+E   assert 'Temperature:' in "Error: Invalid coordinate format. Use 'latitude,longitude' (e.g., '52.52,13.41')"</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_current_weather_various_locations[Tokyo, Japan]" time="0.003"><failure message="assert 'Temperature:' in &quot;Error: Invalid coordinate format. Use 'latitude,longitude' (e.g., '52.52,13.41')&quot;">../tests/unit/test_weather_tools.py:511: in test_get_current_weather_various_locations
+    assert "Temperature:" in result
+E   assert 'Temperature:' in "Error: Invalid coordinate format. Use 'latitude,longitude' (e.g., '52.52,13.41')"</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_current_weather_coordinates[52.52,13.41]" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_current_weather_coordinates[51.5074,-0.1278]" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_current_weather_coordinates[40.7128,-74.0060]" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_current_weather_coordinates[35.6762,139.6503]" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_valid_days[1]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:533: in test_get_weather_forecast_valid_days
+    result = get_weather_forecast("Berlin", days=days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_valid_days[3]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:533: in test_get_weather_forecast_valid_days
+    result = get_weather_forecast("Berlin", days=days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_valid_days[5]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:533: in test_get_weather_forecast_valid_days
+    result = get_weather_forecast("Berlin", days=days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_valid_days[7]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:533: in test_get_weather_forecast_valid_days
+    result = get_weather_forecast("Berlin", days=days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_valid_days[10]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:533: in test_get_weather_forecast_valid_days
+    result = get_weather_forecast("Berlin", days=days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_valid_days[16]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:533: in test_get_weather_forecast_valid_days
+    result = get_weather_forecast("Berlin", days=days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_invalid_days[-5]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:542: in test_get_weather_forecast_invalid_days
+    result = get_weather_forecast("Berlin", days=invalid_days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_invalid_days[0]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:542: in test_get_weather_forecast_invalid_days
+    result = get_weather_forecast("Berlin", days=invalid_days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_invalid_days[17]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:542: in test_get_weather_forecast_invalid_days
+    result = get_weather_forecast("Berlin", days=invalid_days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_invalid_days[100]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:542: in test_get_weather_forecast_invalid_days
+    result = get_weather_forecast("Berlin", days=invalid_days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_invalid_days[five]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:542: in test_get_weather_forecast_invalid_days
+    result = get_weather_forecast("Berlin", days=invalid_days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsParametrized" name="test_get_weather_forecast_invalid_days[None]" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:542: in test_get_weather_forecast_invalid_days
+    result = get_weather_forecast("Berlin", days=invalid_days)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsEdgeCases" name="test_weather_tools_with_very_long_location_name" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsEdgeCases" name="test_weather_tools_with_special_characters" time="0.003" /><testcase classname="tests.unit.test_weather_tools.TestWeatherToolsEdgeCases" name="test_weather_forecast_boundary_days" time="0.001"><failure message="TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'">../tests/unit/test_weather_tools.py:572: in test_weather_forecast_boundary_days
+    result_min = get_weather_forecast("Berlin", days=1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.13/site-packages/langchain_core/_api/deprecation.py:189: in warning_emitting_wrapper
+    return wrapped(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseTool.__call__() got an unexpected keyword argument 'days'</failure></testcase></testsuite></testsuites>
