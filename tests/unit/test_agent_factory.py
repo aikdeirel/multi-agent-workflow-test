@@ -197,12 +197,18 @@ class TestGetOperatorAgents:
     
     @pytest.mark.unit
     def test_get_operator_agents_with_error(self):
-        """Test operator agents retrieval with import error."""
-        with patch('agent_factory.weather_operator', side_effect=ImportError("Import failed")):
+        """Test operator agents retrieval with runtime error."""
+        # Test the actual error handling in the function by causing an exception
+        # in the list creation or logging
+        with patch('agent_factory.logger') as mock_logger:
+            # Mock logger.info to raise an exception to trigger the except block
+            mock_logger.info.side_effect = Exception("Logging error")
+            
             operators = get_operator_agents()
             
-            # Should return empty list on error
+            # Should return empty list on error and log the error
             assert operators == []
+            mock_logger.error.assert_called()
 
 
 class TestCreateLlmFromConfig:
