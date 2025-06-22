@@ -1,0 +1,35 @@
+name: Unit Tests
+
+# Trigger on pull requests to ensure tests pass before merging
+on:
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r src/requirements.txt
+        
+    - name: Run unit tests
+      run: |
+        # Run pytest with verbose output and fail fast
+        python -m pytest tests/ -v --tb=short
+        
+    - name: Test summary
+      if: always()
+      run: |
+        echo "✅ Unit tests completed"
+        echo "This workflow ensures code quality before merging PRs"
