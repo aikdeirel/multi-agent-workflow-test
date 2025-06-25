@@ -204,22 +204,9 @@ def get_current_weather(location: str, include_forecast: bool = False) -> str:
         if not location or not isinstance(location, str):
             return "Error: Please provide a valid location name or coordinates."
 
-        # Handle case where LangChain passes JSON string instead of raw location
-        import json
-
-        actual_location = location
-        if location.startswith('{"location":') or location.startswith("{'location'"):
-            try:
-                # Try to parse as JSON and extract the location
-                data = json.loads(location.replace("'", '"'))
-                if isinstance(data, dict) and "location" in data:
-                    actual_location = data["location"]
-                    logger.debug(f"Extracted location from JSON: {actual_location}")
-            except (json.JSONDecodeError, KeyError):
-                # If JSON parsing fails, use the original string
-                actual_location = location
-
-        actual_location = actual_location.strip()
+        # Handle JSON input using shared utility
+        from shared.input_utils import parse_location_input
+        actual_location = parse_location_input(location)
 
         # Check if input is coordinates (lat,lon format)
         if "," in actual_location:
@@ -325,22 +312,9 @@ def get_weather_forecast(location: str, days: int = 7) -> str:
         if not location or not isinstance(location, str):
             return "Error: Please provide a valid location name or coordinates.\n"
 
-        # Handle case where LangChain passes JSON string instead of raw location
-        import json
-
-        actual_location = location
-        if location.startswith('{"location":') or location.startswith("{'location'"):
-            try:
-                # Try to parse as JSON and extract the location
-                data = json.loads(location.replace("'", '"'))
-                if isinstance(data, dict) and "location" in data:
-                    actual_location = data["location"]
-                    logger.debug(f"Extracted location from JSON: {actual_location}")
-            except (json.JSONDecodeError, KeyError):
-                # If JSON parsing fails, use the original string
-                actual_location = location
-
-        actual_location = actual_location.strip()
+        # Handle JSON input using shared utility
+        from shared.input_utils import parse_location_input
+        actual_location = parse_location_input(location)
 
         # Check if input is coordinates (lat,lon format)
         if "," in actual_location:

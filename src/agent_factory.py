@@ -214,6 +214,7 @@ def get_operator_agents() -> List[Any]:
 def create_llm_from_config() -> ChatMistralAI:
     """
     Create and configure the LLM based on environment variables and JSON configuration.
+    Uses shared utility for consistent LLM creation.
 
     Returns:
         Configured ChatMistralAI instance
@@ -223,36 +224,10 @@ def create_llm_from_config() -> ChatMistralAI:
         RuntimeError: If LLM creation fails
     """
     try:
-        # Load model configuration from JSON (for other settings)
-        model_config = load_json_setting("model_config")
-
-        # Get settings from environment variables
-        from config import get_global_settings
-
-        settings = get_global_settings()
-
-        # Validate required configuration
-        required_keys = ["temperature", "max_tokens", "timeout"]
-        missing_keys = [key for key in required_keys if key not in model_config]
-        if missing_keys:
-            raise ValueError(
-                f"Missing required model configuration keys: {missing_keys}"
-            )
-
-        # Create LLM instance with Mistral-compatible configuration
-        # Use model name from environment, other settings from JSON
-        llm = ChatMistralAI(
-            model=settings.mistral_model,
-            temperature=model_config["temperature"],
-            max_tokens=model_config["max_tokens"],
-            timeout=model_config["timeout"],
-        )
-
-        logger.info(
-            f"Created LLM with model: {settings.mistral_model} (from environment)"
-        )
+        from shared.agent_factory import create_llm
+        llm = create_llm()
+        logger.info("Created LLM using shared utility")
         return llm
-
     except Exception as e:
         logger.error(f"Error creating LLM: {str(e)}")
         raise RuntimeError(f"Failed to create LLM: {str(e)}")

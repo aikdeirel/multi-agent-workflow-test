@@ -169,22 +169,9 @@ def calculate(expression: str) -> str:
         if not expression:
             return "Error: No expression provided. Please provide a mathematical expression to calculate."
 
-        # Handle case where LangChain passes JSON string instead of raw expression
-        import json
-
-        actual_expression = expression
-        if expression.startswith('{"expression":') or expression.startswith(
-            "{'expression'"
-        ):
-            try:
-                # Try to parse as JSON and extract the expression
-                data = json.loads(expression.replace("'", '"'))
-                if isinstance(data, dict) and "expression" in data:
-                    actual_expression = data["expression"]
-                    logger.debug(f"Extracted expression from JSON: {actual_expression}")
-            except (json.JSONDecodeError, KeyError):
-                # If JSON parsing fails, use the original string
-                actual_expression = expression
+        # Handle JSON input using shared utility
+        from shared.input_utils import parse_expression_input
+        actual_expression = parse_expression_input(expression)
 
         # Clean and validate the expression
         clean_expression = validate_math_expression(actual_expression)

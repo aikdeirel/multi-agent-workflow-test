@@ -157,20 +157,9 @@ def get_week_number(date: str) -> str:
     logger.info(f"Getting week number for date: {date}")
 
     try:
-        # Handle case where LangChain passes JSON string instead of raw value
-        import json
-
-        actual_date = date
-        if isinstance(date, str) and date.startswith("{"):
-            try:
-                # Try to parse as JSON and extract the date
-                data = json.loads(date)
-                if isinstance(data, dict) and "date" in data:
-                    actual_date = data["date"]
-                    logger.debug(f"Extracted date from JSON: {actual_date}")
-            except (json.JSONDecodeError, KeyError):
-                # If JSON parsing fails, use the original string
-                actual_date = date
+        # Handle JSON input using shared utility
+        from shared.input_utils import parse_date_input
+        actual_date = parse_date_input(date)
 
         params = {"date": actual_date}
         result = make_digidates_request("/week", params)
@@ -211,17 +200,7 @@ def check_leap_year(year: str) -> str:
         # Handle case where LangChain passes JSON string instead of raw value
         import json
 
-        actual_year = year
-        if isinstance(year, str) and year.startswith("{"):
-            try:
-                # Try to parse as JSON and extract the year
-                data = json.loads(year)
-                if isinstance(data, dict) and "year" in data:
-                    actual_year = data["year"]
-                    logger.debug(f"Extracted year from JSON: {actual_year}")
-            except (json.JSONDecodeError, KeyError):
-                # If JSON parsing fails, use the original string
-                actual_year = year
+        actual_year = parse_year_input(year)
 
         params = {"year": actual_year}
         result = make_digidates_request("/leapyear", params)
@@ -261,20 +240,9 @@ def validate_date(date: str) -> str:
     logger.info(f"Validating date: {date}")
 
     try:
-        # Handle case where LangChain passes JSON string instead of raw value
-        import json
-
-        actual_date = date
-        if isinstance(date, str) and date.startswith("{"):
-            try:
-                # Try to parse as JSON and extract the date
-                data = json.loads(date)
-                if isinstance(data, dict) and "date" in data:
-                    actual_date = data["date"]
-                    logger.debug(f"Extracted date from JSON: {actual_date}")
-            except (json.JSONDecodeError, KeyError):
-                # If JSON parsing fails, use the original string
-                actual_date = date
+        # Handle JSON input using shared utility
+        from shared.input_utils import parse_date_input
+        actual_date = parse_date_input(date)
 
         params = {"date": actual_date}
         result = make_digidates_request("/checkdate", params)
@@ -311,20 +279,9 @@ def get_weekday(date: str) -> str:
     logger.info(f"Getting weekday for date: {date}")
 
     try:
-        # Handle case where LangChain passes JSON string instead of raw value
-        import json
-
-        actual_date = date
-        if isinstance(date, str) and date.startswith("{"):
-            try:
-                # Try to parse as JSON and extract the date
-                data = json.loads(date)
-                if isinstance(data, dict) and "date" in data:
-                    actual_date = data["date"]
-                    logger.debug(f"Extracted date from JSON: {actual_date}")
-            except (json.JSONDecodeError, KeyError):
-                # If JSON parsing fails, use the original string
-                actual_date = date
+        # Handle JSON input using shared utility
+        from shared.input_utils import parse_date_input
+        actual_date = parse_date_input(date)
 
         params = {"date": actual_date}
         result = make_digidates_request("/weekday", params)
@@ -588,17 +545,7 @@ def get_co2_level(year: str) -> str:
         # Handle case where LangChain passes JSON string instead of raw value
         import json
 
-        actual_year = year
-        if isinstance(year, str) and year.startswith("{"):
-            try:
-                # Try to parse as JSON and extract the year
-                data = json.loads(year)
-                if isinstance(data, dict) and "year" in data:
-                    actual_year = data["year"]
-                    logger.debug(f"Extracted year from JSON: {actual_year}")
-            except (json.JSONDecodeError, KeyError):
-                # If JSON parsing fails, use the original string
-                actual_year = year
+        actual_year = parse_year_input(year)
 
         result = make_digidates_request(f"/co2/{actual_year}")
 
